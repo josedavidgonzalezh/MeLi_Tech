@@ -1,9 +1,17 @@
 package com.meli.technical.exam.api.products.application.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class PaginatedResponseDto<T> {
     
     @JsonProperty("content")
@@ -27,9 +35,6 @@ public class PaginatedResponseDto<T> {
     @JsonProperty("hasPrevious")
     private boolean hasPrevious;
 
-    public PaginatedResponseDto() {
-    }
-
     public PaginatedResponseDto(List<T> content, int page, int size, long totalElements) {
         this.content = content;
         this.page = page;
@@ -38,52 +43,5 @@ public class PaginatedResponseDto<T> {
         this.totalPages = (int) Math.ceil((double) totalElements / size);
         this.hasNext = page < totalPages - 1;
         this.hasPrevious = page > 0;
-    }
-
-    public List<T> getContent() {
-        return content;
-    }
-
-    public void setContent(List<T> content) {
-        this.content = content;
-    }
-
-    public int getPage() {
-        return page;
-    }
-
-    public void setPage(int page) {
-        this.page = page;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
-    }
-
-    public long getTotalElements() {
-        return totalElements;
-    }
-
-    public void setTotalElements(long totalElements) {
-        this.totalElements = totalElements;
-        this.totalPages = (int) Math.ceil((double) totalElements / size);
-        this.hasNext = page < totalPages - 1;
-        this.hasPrevious = page > 0;
-    }
-
-    public int getTotalPages() {
-        return totalPages;
-    }
-
-    public boolean isHasNext() {
-        return hasNext;
-    }
-
-    public boolean isHasPrevious() {
-        return hasPrevious;
     }
 }

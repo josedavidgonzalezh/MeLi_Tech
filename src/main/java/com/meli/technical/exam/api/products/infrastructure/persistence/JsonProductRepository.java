@@ -39,8 +39,6 @@ public class JsonProductRepository implements ProductRepository {
     }
 
     private void loadProductsFromFile() {
-        logger.info("Loading products from JSON file: {}", PRODUCTS_DATA_PATH);
-        
         try {
             ClassPathResource resource = new ClassPathResource(PRODUCTS_DATA_PATH);
             
@@ -59,19 +57,15 @@ public class JsonProductRepository implements ProductRepository {
                     Product product = productMapper.toDomain(dto);
                     productsCache.put(product.getId(), product);
                 }
-                
-                logger.info("Successfully loaded {} products from JSON file", productsCache.size());
             }
             
         } catch (IOException e) {
-            logger.error("Failed to load products from JSON file: {}", PRODUCTS_DATA_PATH, e);
             throw new ProductDataException("Failed to initialize product data", e);
         }
     }
 
     @Override
     public Mono<Product> findById(String id) {
-        logger.debug("Finding product by id: {}", id);
         
         if (id == null || id.trim().isEmpty()) {
             return Mono.empty();
@@ -83,7 +77,6 @@ public class JsonProductRepository implements ProductRepository {
 
     @Override
     public Flux<Product> findByIds(List<String> ids) {
-        logger.debug("Finding products by ids: {}", ids);
         
         if (ids == null || ids.isEmpty()) {
             return Flux.empty();
@@ -96,29 +89,22 @@ public class JsonProductRepository implements ProductRepository {
                         return null;
                     }
                     return productsCache.get(id.trim());
-                })
-                .doOnNext(product -> logger.debug("Found product: {}", product.getName()));
+                });
     }
 
     @Override
     public Flux<Product> findAll() {
-        logger.debug("Finding all products");
-        
-        return Flux.fromIterable(new ArrayList<>(productsCache.values()))
-                .doOnNext(product -> logger.trace("Retrieved product: {}", product.getName()));
+        return Flux.fromIterable(new ArrayList<>(productsCache.values()));
     }
 
     @Override
     public Mono<Long> count() {
-        logger.debug("Counting total products");
-        
         long count = productsCache.size();
         return Mono.just(count);
     }
 
     @Override
     public Flux<Product> findAllPaginated(int page, int size) {
-        logger.debug("Finding paginated products - page: {}, size: {}", page, size);
         
         if (page < 0 || size <= 0) {
             return Flux.error(new IllegalArgumentException("Page must be non-negative and size must be positive"));
@@ -134,17 +120,7 @@ public class JsonProductRepository implements ProductRepository {
         int endIndex = Math.min(startIndex + size, allProducts.size());
         List<Product> paginatedProducts = allProducts.subList(startIndex, endIndex);
         
-        return Flux.fromIterable(paginatedProducts)
-                .doOnNext(product -> logger.trace("Retrieved paginated product: {}", product.getName()));
+        return Flux.fromIterable(paginatedProducts);
     }
 
-    public void refreshCache() {
-        logger.info("Refreshing products cache");
-        productsCache.clear();
-        loadProductsFromFile();
-    }
-
-    public int getCacheSize() {
-        return productsCache.size();
-    }
 }

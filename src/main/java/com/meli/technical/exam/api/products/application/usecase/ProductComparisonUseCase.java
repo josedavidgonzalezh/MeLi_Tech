@@ -26,25 +26,20 @@ public class ProductComparisonUseCase {
     }
 
     public Mono<ProductDto> getProductById(String id) {
-        logger.info("Getting product by id: {}", id);
-        
         return productService.findById(id)
                 .map(productMapper::toDto)
                 .switchIfEmpty(Mono.error(new ProductNotFoundException("Product not found with id: " + id)))
-                .doOnSuccess(product -> logger.info("Successfully retrieved product: {}", product.getName()))
                 .doOnError(error -> logger.error("Failed to get product by id: {}", id, error));
     }
 
     public Mono<ComparisonResponseDto> compareProducts(List<String> productIds) {
-        logger.info("Comparing products with ids: {}", productIds);
-        
         if (productIds == null || productIds.isEmpty()) {
             logger.warn("Empty or null product IDs provided for comparison");
             return Mono.just(new ComparisonResponseDto(List.of(), List.of()));
         }
 
+        //Constante puede ir en otro archivo
         if (productIds.size() > 10) {
-            logger.warn("Too many products requested for comparison: {}", productIds.size());
             return Mono.error(new IllegalArgumentException("Cannot compare more than 10 products at once"));
         }
 
@@ -53,9 +48,7 @@ public class ProductComparisonUseCase {
                 .collectList()
                 .map(products -> {
                     ComparisonResponseDto response = new ComparisonResponseDto(products, productIds);
-                    logger.info("Successfully compared {} products out of {} requested", 
-                               products.size(), productIds.size());
-                    
+
                     if (products.size() < productIds.size()) {
                         logger.warn("Some products were not found. Requested: {}, Found: {}", 
                                    productIds.size(), products.size());
@@ -67,7 +60,6 @@ public class ProductComparisonUseCase {
     }
 
     public Mono<PaginatedResponseDto<ProductDto>> getAllProductsPaginated(int page, int size) {
-        logger.info("Getting paginated products - page: {}, size: {}", page, size);
         
         if (page < 0 || size <= 0 || size > 100) {
             logger.warn("Invalid pagination parameters - page: {}, size: {}", page, size);
@@ -83,8 +75,6 @@ public class ProductComparisonUseCase {
                             .map(products -> {
                                 PaginatedResponseDto<ProductDto> response = 
                                     new PaginatedResponseDto<>(products, page, size, totalElements);
-                                logger.info("Successfully retrieved {} products for page {}", 
-                                           products.size(), page);
                                 return response;
                             })
                 )
@@ -92,8 +82,6 @@ public class ProductComparisonUseCase {
     }
 
     public Mono<PaginatedResponseDto<ProductDto>> getAllProducts() {
-        logger.info("Getting all products");
-        
         return productService.count()
                 .flatMap(totalElements -> 
                     productService.findAll()
@@ -102,7 +90,6 @@ public class ProductComparisonUseCase {
                             .map(products -> {
                                 PaginatedResponseDto<ProductDto> response = 
                                     new PaginatedResponseDto<>(products, 0, products.size(), totalElements);
-                                logger.info("Successfully retrieved all {} products", products.size());
                                 return response;
                             })
                 )

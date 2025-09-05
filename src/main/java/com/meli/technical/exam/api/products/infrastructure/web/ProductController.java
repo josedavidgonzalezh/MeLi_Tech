@@ -30,13 +30,9 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public Mono<ResponseEntity<ProductDto>> getProductById(@PathVariable String id) {
-        logger.info("GET /api/v1/products/{} - Retrieving product by ID", id);
         
         return productComparisonUseCase.getProductById(id)
-                .map(product -> {
-                    logger.info("Successfully retrieved product: {}", product.getName());
-                    return ResponseEntity.ok(product);
-                })
+                .map(ResponseEntity::ok)
                 .doOnError(error -> logger.error("Error retrieving product by ID: {}", id, error));
     }
 
@@ -44,10 +40,7 @@ public class ProductController {
     public Mono<ResponseEntity<ComparisonResponseDto>> compareProducts(
             @RequestParam("ids") String ids) {
         
-        logger.info("GET /api/v1/products/compare?ids={} - Comparing products", ids);
-        
         if (ids == null || ids.trim().isEmpty()) {
-            logger.warn("Empty or null product IDs provided for comparison");
             return Mono.just(ResponseEntity.badRequest()
                     .body(new ComparisonResponseDto(List.of(), List.of())));
         }
@@ -62,17 +55,12 @@ public class ProductController {
                 .toList();
 
         if (cleanIds.isEmpty()) {
-            logger.warn("No valid product IDs after cleaning: {}", ids);
             return Mono.just(ResponseEntity.badRequest()
                     .body(new ComparisonResponseDto(List.of(), List.of())));
         }
 
         return productComparisonUseCase.compareProducts(cleanIds)
-                .map(response -> {
-                    logger.info("Successfully compared {} products out of {} requested", 
-                               response.getTotalProducts(), cleanIds.size());
-                    return ResponseEntity.ok(response);
-                })
+                .map(ResponseEntity::ok)
                 .doOnError(error -> logger.error("Error comparing products: {}", cleanIds, error));
     }
 
@@ -80,8 +68,6 @@ public class ProductController {
     public Mono<ResponseEntity<PaginatedResponseDto<ProductDto>>> getProducts(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
-        
-        logger.info("GET /api/v1/products?page={}&size={} - Retrieving paginated products", page, size);
         
         // Validate pagination parameters
         final int validatedPage = page < 0 ? 0 : page;
@@ -98,17 +84,12 @@ public class ProductController {
         // If requesting first page with large size, return all products
         if (validatedPage == 0 && validatedSize >= 50) {
             return productComparisonUseCase.getAllProducts()
-                    .map(response -> {
-                        logger.info("Successfully retrieved all {} products", response.getTotalElements());
-                        return ResponseEntity.ok(response);
-                    })
+                    .map(ResponseEntity::ok)
                     .doOnError(error -> logger.error("Error retrieving all products", error));
         }
 
         return productComparisonUseCase.getAllProductsPaginated(validatedPage, validatedSize)
                 .map(response -> {
-                    logger.info("Successfully retrieved {} products for page {} with size {}", 
-                               response.getContent().size(), validatedPage, validatedSize);
                     return ResponseEntity.ok(response);
                 })
                 .doOnError(error -> logger.error("Error retrieving paginated products", error));
@@ -116,7 +97,6 @@ public class ProductController {
 
     @GetMapping("/health")
     public Mono<ResponseEntity<String>> healthCheck() {
-        logger.debug("GET /api/v1/products/health - Health check requested");
         return Mono.just(ResponseEntity.ok("Products API is healthy"));
     }
 }
