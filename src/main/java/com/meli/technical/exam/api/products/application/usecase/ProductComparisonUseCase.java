@@ -41,7 +41,7 @@ public class ProductComparisonUseCase {
 
     public Mono<ComparisonResponseDto> compareProducts(List<String> productIds) {
         if (productIds == null || productIds.isEmpty()) {
-            return Mono.just(comparisonAnalyzer.analyzeProducts(List.of(), productIds));
+            return comparisonAnalyzer.analyzeProducts(List.of(), productIds);
         }
 
         //Constante puede ir en otro archivo
@@ -52,7 +52,7 @@ public class ProductComparisonUseCase {
         return productService.findProductsForComparison(productIds)
                 .map(productMapper::toDto)
                 .collectList()
-                .map(products -> {
+                .flatMap(products -> {
                     if (products.size() < productIds.size()) {
                         logger.warn("Some products were not found. Requested: {}, Found: {}", 
                                    productIds.size(), products.size());

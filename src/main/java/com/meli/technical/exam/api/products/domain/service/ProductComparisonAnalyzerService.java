@@ -2,276 +2,104 @@ package com.meli.technical.exam.api.products.domain.service;
 
 import com.meli.technical.exam.api.products.application.dto.request.ProductDto;
 import com.meli.technical.exam.api.products.application.dto.response.comparison.*;
+import com.meli.technical.exam.api.products.domain.service.analysis.ProductStats;
+import com.meli.technical.exam.api.products.domain.service.analysis.strategy.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.Instant;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class ProductComparisonAnalyzerService {
-
-    public ComparisonResponseDto analyzeProducts(List<ProductDto> products, List<String> requestedIds) {
+    
+    private static final Logger logger = LoggerFactory.getLogger(ProductComparisonAnalyzerService.class);
+    
+    private final PriceAnalysisStrategy priceAnalysisStrategy;
+    private final RatingAnalysisStrategy ratingAnalysisStrategy;
+    private final SpecificationAnalysisStrategy specificationAnalysisStrategy;
+    private final RecommendationEngine recommendationEngine;
+    private final SummaryGenerationStrategy summaryGenerationStrategy;
+    
+    public ProductComparisonAnalyzerService(PriceAnalysisStrategy priceAnalysisStrategy,
+                                          RatingAnalysisStrategy ratingAnalysisStrategy,
+                                          SpecificationAnalysisStrategy specificationAnalysisStrategy,
+                                          RecommendationEngine recommendationEngine,
+                                          SummaryGenerationStrategy summaryGenerationStrategy) {
+        this.priceAnalysisStrategy = priceAnalysisStrategy;
+        this.ratingAnalysisStrategy = ratingAnalysisStrategy;
+        this.specificationAnalysisStrategy = specificationAnalysisStrategy;
+        this.recommendationEngine = recommendationEngine;
+        this.summaryGenerationStrategy = summaryGenerationStrategy;
+    }
+    
+    /**
+     * Reactive version - preferred method
+     */
+    public Mono<ComparisonResponseDto> analyzeProductsReactive(Flux<ProductDto> productFlux, List<String> requestedIds) {
+        return productFlux
+                .collectList()
+                .flatMap(products -> analyzeProductsFromList(products, requestedIds))
+                .doOnSubscribe(subscription -> logger.debug("Starting reactive product analysis"))
+                .doOnSuccess(result -> logger.debug("Completed reactive analysis for {} products", result.getTotalProducts()))
+                .doOnError(error -> logger.error("Error during reactive product analysis", error));
+    }
+    
+    /**
+     * Legacy method - kept for backward compatibility (now reactive)
+     */
+    public Mono<ComparisonResponseDto> analyzeProducts(List<ProductDto> products, List<String> requestedIds) {
+        return analyzeProductsFromList(products, requestedIds);
+    }
+    
+    private Mono<ComparisonResponseDto> analyzeProductsFromList(List<ProductDto> products, List<String> requestedIds) {
         if (products == null || products.isEmpty()) {
-            return createEmptyResponse(requestedIds);
+            return Mono.just(createEmptyResponse(requestedIds));
         }
-
-        return ComparisonResponseDto.builder()
-                .products(products)
-                .totalProducts(products.size())
-                .requestedIds(requestedIds)
-                .comparisonTimestamp(Instant.now())
-                .priceAnalysis(analyzePrices(products))
-                .ratingAnalysis(analyzeRatings(products))
-                .specificationAnalysis(analyzeSpecifications(products))
-                .recommendations(generateRecommendations(products))
-                .summary(generateSummary(products))
-                .build();
+        
+        return Mono.fromSupplier(() -> ProductStats.fromProducts(products))
+                .flatMap(this::performAnalysis)
+                .map(analysisResults -> ComparisonResponseDto.builder()
+                        .products(products)
+                        .totalProducts(products.size())
+                        .requestedIds(requestedIds)
+                        .comparisonTimestamp(Instant.now())
+                        .priceAnalysis(analysisResults.priceAnalysis)
+                        .ratingAnalysis(analysisResults.ratingAnalysis)
+                        .specificationAnalysis(analysisResults.specificationAnalysis)
+                        .recommendations(analysisResults.recommendations)
+                        .summary(analysisResults.summary)
+                        .build());
     }
-
-    private PriceAnalysisDto analyzePrices(List<ProductDto> products) {
-        ProductDto cheapest = products.stream()
-                .min(Comparator.comparing(ProductDto::getPrice))
-                .orElse(null);
-
-        ProductDto mostExpensive = products.stream()
-                .max(Comparator.comparing(ProductDto::getPrice))
-                .orElse(null);
-
-        BigDecimal priceRange = mostExpensive != null && cheapest != null
-                ? mostExpensive.getPrice().subtract(cheapest.getPrice())
-                : BigDecimal.ZERO;
-
-        BigDecimal averagePrice = products.stream()
-                .map(ProductDto::getPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .divide(BigDecimal.valueOf(products.size()), 2, RoundingMode.HALF_UP);
-
-        Map<String, BigDecimal> priceDistribution = products.stream()
-                .collect(Collectors.toMap(ProductDto::getName, ProductDto::getPrice));
-
-        return PriceAnalysisDto.builder()
-                .cheapestProduct(cheapest)
-                .mostExpensiveProduct(mostExpensive)
-                .priceRange(priceRange)
-                .averagePrice(averagePrice)
-                .priceDistribution(priceDistribution)
-                .build();
+    
+    private Mono<AnalysisResults> performAnalysis(ProductStats productStats) {
+        return Mono.zip(
+                priceAnalysisStrategy.analyze(productStats),
+                ratingAnalysisStrategy.analyze(productStats),
+                specificationAnalysisStrategy.analyze(productStats),
+                recommendationEngine.analyze(productStats),
+                summaryGenerationStrategy.analyze(productStats)
+        ).map(tuple -> new AnalysisResults(
+                tuple.getT1(), // priceAnalysis
+                tuple.getT2(), // ratingAnalysis  
+                tuple.getT3(), // specificationAnalysis
+                tuple.getT4(), // recommendations
+                tuple.getT5()  // summary
+        ));
     }
-
-    private RatingAnalysisDto analyzeRatings(List<ProductDto> products) {
-        ProductDto bestRated = products.stream()
-                .max(Comparator.comparing(ProductDto::getRating))
-                .orElse(null);
-
-        ProductDto lowestRated = products.stream()
-                .min(Comparator.comparing(ProductDto::getRating))
-                .orElse(null);
-
-        Double averageRating = products.stream()
-                .mapToDouble(ProductDto::getRating)
-                .average()
-                .orElse(0.0);
-
-        Map<String, Double> ratingDistribution = products.stream()
-                .collect(Collectors.toMap(ProductDto::getName, ProductDto::getRating));
-
-        List<ProductDto> highlyRated = products.stream()
-                .filter(p -> p.getRating() >= 4.5)
-                .collect(Collectors.toList());
-
-        return RatingAnalysisDto.builder()
-                .bestRatedProduct(bestRated)
-                .lowestRatedProduct(lowestRated)
-                .averageRating(Math.round(averageRating * 10.0) / 10.0)
-                .ratingDistribution(ratingDistribution)
-                .highlyRatedProducts(highlyRated)
-                .build();
-    }
-
-    private SpecificationAnalysisDto analyzeSpecifications(List<ProductDto> products) {
-        Set<String> allSpecKeys = products.stream()
-                .flatMap(p -> p.getSpecifications().stream())
-                .map(spec -> spec.getKey())
-                .collect(Collectors.toSet());
-
-        Set<String> commonSpecs = allSpecKeys.stream()
-                .filter(specKey -> products.stream()
-                        .allMatch(product -> product.getSpecifications().stream()
-                                .anyMatch(spec -> spec.getKey().equals(specKey))))
-                .collect(Collectors.toSet());
-
-        Map<String, Set<String>> uniqueSpecs = products.stream()
-                .collect(Collectors.toMap(
-                        ProductDto::getName,
-                        product -> product.getSpecifications().stream()
-                                .map(spec -> spec.getKey())
-                                .filter(specKey -> !commonSpecs.contains(specKey))
-                                .collect(Collectors.toSet())
-                ));
-
-        Map<String, Map<String, String>> specComparison = new HashMap<>();
-        for (String specKey : commonSpecs) {
-            Map<String, String> productValues = products.stream()
-                    .collect(Collectors.toMap(
-                            ProductDto::getName,
-                            product -> product.getSpecifications().stream()
-                                    .filter(spec -> spec.getKey().equals(specKey))
-                                    .map(spec -> spec.getValue())
-                                    .findFirst()
-                                    .orElse("N/A")
-                    ));
-            specComparison.put(specKey, productValues);
-        }
-
-        ProductDto mostFeatured = products.stream()
-                .max(Comparator.comparing(p -> p.getSpecifications().size()))
-                .orElse(null);
-
-        return SpecificationAnalysisDto.builder()
-                .commonSpecifications(commonSpecs)
-                .uniqueSpecifications(uniqueSpecs)
-                .specificationComparison(specComparison)
-                .mostFeaturedProduct(mostFeatured)
-                .build();
-    }
-
-    private List<RecommendationDto> generateRecommendations(List<ProductDto> products) {
-        List<RecommendationDto> recommendations = new ArrayList<>();
-
-        ProductDto bestValue = calculateBestValue(products);
-        if (bestValue != null) {
-            recommendations.add(RecommendationDto.builder()
-                    .type("BEST_VALUE")
-                    .title("Best Value for Money")
-                    .description("This product offers the best balance of price, quality, and features")
-                    .recommendedProduct(bestValue)
-                    .reason("Optimal price-to-rating ratio with comprehensive features")
-                    .build());
-        }
-
-        ProductDto cheapest = products.stream()
-                .min(Comparator.comparing(ProductDto::getPrice))
-                .orElse(null);
-        if (cheapest != null) {
-            recommendations.add(RecommendationDto.builder()
-                    .type("BUDGET_FRIENDLY")
-                    .title("Most Affordable Option")
-                    .description("Best choice if budget is your primary concern")
-                    .recommendedProduct(cheapest)
-                    .reason("Lowest price among compared products")
-                    .build());
-        }
-
-        ProductDto bestRated = products.stream()
-                .max(Comparator.comparing(ProductDto::getRating))
-                .orElse(null);
-        if (bestRated != null) {
-            recommendations.add(RecommendationDto.builder()
-                    .type("PREMIUM_CHOICE")
-                    .title("Highest Quality")
-                    .description("Top-rated product with the best customer satisfaction")
-                    .recommendedProduct(bestRated)
-                    .reason("Highest customer rating among compared products")
-                    .build());
-        }
-
-        return recommendations;
-    }
-
-    private ComparisonSummaryDto generateSummary(List<ProductDto> products) {
-        ProductDto bestValue = calculateBestValue(products);
-        ProductDto bestQuality = products.stream()
-                .max(Comparator.comparing(ProductDto::getRating))
-                .orElse(null);
-        ProductDto budgetOption = products.stream()
-                .min(Comparator.comparing(ProductDto::getPrice))
-                .orElse(null);
-
-        List<String> insights = generateInsights(products);
-        String conclusion = generateConclusion(products, bestValue, bestQuality, budgetOption);
-
-        return ComparisonSummaryDto.builder()
-                .bestValue(bestValue)
-                .bestQuality(bestQuality)
-                .budgetOption(budgetOption)
-                .insights(insights)
-                .conclusion(conclusion)
-                .build();
-    }
-
-    private ProductDto calculateBestValue(List<ProductDto> products) {
-        return products.stream()
-                .max(Comparator.comparing(product -> {
-                    double normalizedRating = product.getRating() / 5.0;
-                    double maxPrice = products.stream()
-                            .mapToDouble(p -> p.getPrice().doubleValue())
-                            .max().orElse(1.0);
-                    double normalizedPrice = product.getPrice().doubleValue() / maxPrice;
-                    return normalizedRating / normalizedPrice;
-                }))
-                .orElse(null);
-    }
-
-    private List<String> generateInsights(List<ProductDto> products) {
-        List<String> insights = new ArrayList<>();
-
-        BigDecimal priceRange = products.stream()
-                .map(ProductDto::getPrice)
-                .max(BigDecimal::compareTo)
-                .orElse(BigDecimal.ZERO)
-                .subtract(products.stream()
-                        .map(ProductDto::getPrice)
-                        .min(BigDecimal::compareTo)
-                        .orElse(BigDecimal.ZERO));
-
-        double ratingRange = products.stream()
-                .mapToDouble(ProductDto::getRating)
-                .max().orElse(0.0) -
-                products.stream()
-                        .mapToDouble(ProductDto::getRating)
-                        .min().orElse(0.0);
-
-        insights.add(String.format("Price range: $%.2f across all products", priceRange));
-        insights.add(String.format("Rating variance: %.1f points between highest and lowest rated", ratingRange));
-
-        long highRatedCount = products.stream()
-                .filter(p -> p.getRating() >= 4.5)
-                .count();
-
-        if (highRatedCount > 0) {
-            insights.add(String.format("%d out of %d products are highly rated (4.5+ stars)",
-                    highRatedCount, products.size()));
-        }
-
-        return insights;
-    }
-
-    private String generateConclusion(List<ProductDto> products, ProductDto bestValue,
-                                      ProductDto bestQuality, ProductDto budgetOption) {
-        if (products.size() == 1) {
-            return "Only one product available for comparison.";
-        }
-
-        StringBuilder conclusion = new StringBuilder();
-
-        if (bestValue != null && bestQuality != null && budgetOption != null) {
-            if (bestValue.equals(bestQuality) && bestValue.equals(budgetOption)) {
-                conclusion.append(String.format("%s stands out as the clear winner across all categories.",
-                        bestValue.getName()));
-            } else {
-                conclusion.append("Each product has its strengths: ");
-                conclusion.append(String.format("%s for value, ", bestValue.getName()));
-                conclusion.append(String.format("%s for quality, ", bestQuality.getName()));
-                conclusion.append(String.format("and %s for budget-conscious buyers.", budgetOption.getName()));
-            }
-        }
-
-        return conclusion.toString();
-    }
-
+    
+    private record AnalysisResults(
+            PriceAnalysisDto priceAnalysis,
+            RatingAnalysisDto ratingAnalysis,
+            SpecificationAnalysisDto specificationAnalysis,
+            List<RecommendationDto> recommendations,
+            ComparisonSummaryDto summary
+    ) {}
+    
     private ComparisonResponseDto createEmptyResponse(List<String> requestedIds) {
         return ComparisonResponseDto.builder()
                 .products(Collections.emptyList())
@@ -285,4 +113,5 @@ public class ProductComparisonAnalyzerService {
                 .summary(null)
                 .build();
     }
+
 }
