@@ -1,0 +1,342 @@
+[
+  {
+    "id": "1",
+    "name": "Samsung Galaxy S24 Ultra",
+    "imageUrl": "https://images.samsung.com/us/smartphones/galaxy-s24-ultra/images/galaxy-s24-ultra-highlights-camera.jpg",
+    "description": "The most powerful Galaxy S ever with advanced AI features, S Pen, and pro-grade camera system",
+    "price": 1299.99,
+    "rating": 4.8,
+    "specifications": [
+      {
+        "key": "Display",
+        "value": "6.8-inch Dynamic AMOLED 2X"
+      },
+      {
+        "key": "Storage",
+        "value": "256GB"
+      },
+      {
+        "key": "RAM",
+        "value": "12GB"
+      },
+      {
+        "key": "Camera",
+        "value": "200MP main + 50MP periscope telephoto + 10MP telephoto + 12MP ultrawide"
+      },
+      {
+        "key": "Battery",
+        "value": "5000mAh"
+      },
+      {
+        "key": "Operating System",
+        "value": "Android 14 with One UI 6.1"
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "name": "iPhone 15 Pro Max",
+    "imageUrl": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-max-naturaltitanium-pdp-image-position-1a.jpg",
+    "description": "The ultimate iPhone with titanium design, Action Button, and advanced camera system",
+    "price": 1199.99,
+    "rating": 4.7,
+    "specifications": [
+      {
+        "key": "Display",
+        "value": "6.7-inch Super Retina XDR OLED"
+      },
+      {
+        "key": "Storage",
+        "value": "256GB"
+      },
+      {
+        "key": "RAM",
+        "value": "8GB"
+      },
+      {
+        "key": "Camera",
+        "value": "48MP main + 12MP ultrawide + 12MP telephoto"
+      },
+      {
+        "key": "Battery",
+        "value": "4441mAh"
+      },
+      {
+        "key": "Operating System",
+        "value": "iOS 17"
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "name": "Google Pixel 8 Pro",
+    "imageUrl": "https://lh3.googleusercontent.com/YScP5LbBCGXL8pGJhyZWEe4lZcH_fPX4BdZcLjlpE9Q",
+    "description": "Google's flagship phone with advanced AI features, Magic Eraser, and pure Android experience",
+    "price": 999.99,
+    "rating": 4.6,
+    "specifications": [
+      {
+        "key": "Display",
+        "value": "6.7-inch LTPO OLED"
+      },
+      {
+        "key": "Storage",
+        "value": "128GB"
+      },
+      {
+        "key": "RAM",
+        "value": "12GB"
+      },
+      {
+        "key": "Camera",
+        "value": "50MP main + 48MP ultrawide + 48MP telephoto"
+      },
+      {
+        "key": "Battery",
+        "value": "5050mAh"
+      },
+      {
+        "key": "Operating System",
+        "value": "Android 14"
+      }
+    ]
+  },
+  {
+    "id": "4",
+    "name": "OnePlus 12",
+    "imageUrl": "https://oasis.opstatics.com/content/dam/oasis/page/2024/global/products/oneplus-12/specs/images/kv-image.png",
+    "description": "Flagship killer with Snapdragon 8 Gen 3, ultra-fast charging, and premium build quality",
+    "price": 899.99,
+    "rating": 4.5,
+    "specifications": [
+      {
+        "key": "Display",
+        "value": "6.82-inch LTPO AMOLED"
+      },
+      {
+        "key": "Storage",
+        "value": "256GB"
+      },
+      {
+        "key": "RAM",
+        "value": "16GB"
+      },
+      {
+        "key": "Camera",
+        "value": "50MP main + 64MP periscope telephoto + 48MP ultrawide"
+      },
+      {
+        "key": "Battery",
+        "value": "5400mAh"
+      },
+      {
+        "key": "Operating System",
+        "value": "OxygenOS 14 based on Android 14"
+      }
+    ]
+  },
+  {
+    "id": "5",
+    "name": "Xiaomi 14 Ultra",
+    "imageUrl": "https://i01.appmifile.com/v1/MI_18455B3E4DA706226CF7535A58E875F0267/pms_1710756359.46933468.png",
+    "description": "Photography-focused flagship with Leica-tuned cameras and premium design",
+    "price": 1149.99,
+    "rating": 4.4,
+    "specifications": [
+      {
+        "key": "Display",
+        "value": "6.73-inch LTPO OLED"
+      },
+      {
+        "key": "Storage",
+        "value": "512GB"
+      },
+      {
+        "key": "RAM",
+        "value": "16GB"
+      },
+      {
+        "key": "Camera",
+        "value": "50MP main + 50MP periscope telephoto + 50MP telephoto + 50MP ultrawide"
+      },
+      {
+        "key": "Battery",
+        "value": "5300mAh"
+      },
+      {
+        "key": "Operating System",
+        "value": "HyperOS based on Android 14"
+      }
+    ]
+  },
+  {
+    "id": "6",
+    "name": "Sony Xperia 1 VI",
+    "imageUrl": "https://www.sony.com/image/7c5e3e7f0c1d1b8a9f0b2c3d4e5f6a7b8c9d0e1f",
+    "description": "Professional camera phone with 4K display and advanced video recording capabilities",
+    "price": 1399.99,
+    "rating": 4.3,
+    "specifications": [
+      {
+        "key": "Display",
+        "value": "6.5-inch 4K OLED"
+      },
+      {
+        "key": "Storage",
+        "value": "256GB"
+      },
+      {
+        "key": "RAM",
+        "value": "12GB"
+      },
+      {
+        "key": "Camera",
+        "value": "48MP main + 12MP ultrawide + 12MP telephoto"
+      },
+      {
+        "key": "Battery",
+        "value": "5000mAh"
+      },
+      {
+        "key": "Operating System",
+        "value": "Android 14"
+      }
+    ]
+  },
+  {
+    "id": "7",
+    "name": "Nothing Phone (2a)",
+    "imageUrl": "https://assets.nothing.tech/images/phone2a/hero-image.png",
+    "description": "Unique transparent design with Glyph Interface and clean Android experience",
+    "price": 399.99,
+    "rating": 4.2,
+    "specifications": [
+      {
+        "key": "Display",
+        "value": "6.7-inch AMOLED"
+      },
+      {
+        "key": "Storage",
+        "value": "256GB"
+      },
+      {
+        "key": "RAM",
+        "value": "12GB"
+      },
+      {
+        "key": "Camera",
+        "value": "50MP main + 50MP ultrawide"
+      },
+      {
+        "key": "Battery",
+        "value": "5000mAh"
+      },
+      {
+        "key": "Operating System",
+        "value": "Nothing OS 2.5 based on Android 14"
+      }
+    ]
+  },
+  {
+    "id": "8",
+    "name": "ASUS ROG Phone 8 Pro",
+    "imageUrl": "https://www.asus.com/media/global/products/rogphone8pro/kv-image.png",
+    "description": "Ultimate gaming phone with advanced cooling, gaming accessories, and high refresh rate display",
+    "price": 1199.99,
+    "rating": 4.6,
+    "specifications": [
+      {
+        "key": "Display",
+        "value": "6.78-inch AMOLED 165Hz"
+      },
+      {
+        "key": "Storage",
+        "value": "512GB"
+      },
+      {
+        "key": "RAM",
+        "value": "24GB"
+      },
+      {
+        "key": "Camera",
+        "value": "50MP main + 32MP telephoto + 13MP ultrawide"
+      },
+      {
+        "key": "Battery",
+        "value": "6000mAh"
+      },
+      {
+        "key": "Operating System",
+        "value": "ROG UI based on Android 14"
+      }
+    ]
+  },
+  {
+    "id": "9",
+    "name": "Motorola Edge 50 Ultra",
+    "imageUrl": "https://motorola-global-portal.s3.amazonaws.com/edge50ultra/hero-image.png",
+    "description": "Premium mid-range phone with curved display, fast charging, and clean Android experience",
+    "price": 799.99,
+    "rating": 4.1,
+    "specifications": [
+      {
+        "key": "Display",
+        "value": "6.7-inch pOLED curved"
+      },
+      {
+        "key": "Storage",
+        "value": "512GB"
+      },
+      {
+        "key": "RAM",
+        "value": "16GB"
+      },
+      {
+        "key": "Camera",
+        "value": "50MP main + 64MP telephoto + 50MP ultrawide"
+      },
+      {
+        "key": "Battery",
+        "value": "4500mAh"
+      },
+      {
+        "key": "Operating System",
+        "value": "Android 14"
+      }
+    ]
+  },
+  {
+    "id": "10",
+    "name": "Huawei Pura 70 Ultra",
+    "imageUrl": "https://consumer.huawei.com/content/dam/huawei-cbg-site/common/mkt/pdp/phones/pura70ultra/hero-image.png",
+    "description": "Premium flagship with advanced photography capabilities and elegant design",
+    "price": 1099.99,
+    "rating": 4.5,
+    "specifications": [
+      {
+        "key": "Display",
+        "value": "6.8-inch LTPO OLED curved"
+      },
+      {
+        "key": "Storage",
+        "value": "512GB"
+      },
+      {
+        "key": "RAM",
+        "value": "16GB"
+      },
+      {
+        "key": "Camera",
+        "value": "50MP main + 50MP periscope telephoto + 40MP ultrawide"
+      },
+      {
+        "key": "Battery",
+        "value": "5200mAh"
+      },
+      {
+        "key": "Operating System",
+        "value": "HarmonyOS 4.2"
+      }
+    ]
+  }
+]
