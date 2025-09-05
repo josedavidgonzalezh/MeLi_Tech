@@ -1,8 +1,9 @@
 package com.meli.technical.exam.api.products.application.service;
 
 import com.meli.technical.exam.api.products.application.dto.request.ProductDto;
-import com.meli.technical.exam.api.products.application.dto.response.ComparisonResponseDto;
+
 import com.meli.technical.exam.api.products.application.dto.response.PaginatedResponseDto;
+import com.meli.technical.exam.api.products.application.dto.response.comparison.ComparisonResponseDto;
 import com.meli.technical.exam.api.products.application.usecase.ProductComparisonUseCase;
 import com.meli.technical.exam.api.products.domain.event.DomainEventPublisher;
 import com.meli.technical.exam.api.products.domain.event.ProductComparedEvent;
@@ -31,8 +32,6 @@ public class ProductApplicationService {
     }
     
     public Mono<ProductDto> getProductById(String id) {
-        logger.info("Retrieving product with ID: {}", id);
-        
         return productComparisonUseCase.getProductById(id)
                 .doOnSuccess(product -> {
                     if (product != null) {
@@ -80,15 +79,11 @@ public class ProductApplicationService {
     
     public Mono<PaginatedResponseDto<ProductDto>> getAllProducts(int page, int size) {
         return productComparisonUseCase.getAllProductsPaginated(page, size)
-                .doOnSuccess(result -> logger.info("Retrieved {} products for page {}", 
-                                                  result.getContent().size(), page))
                 .doOnError(error -> logger.error("Failed to retrieve paginated products", error));
     }
     
     public Mono<PaginatedResponseDto<ProductDto>> getAllProducts() {
         return productComparisonUseCase.getAllProducts()
-                .doOnSuccess(result -> logger.info("Retrieved {} total products", 
-                                                  result.getTotalElements()))
                 .doOnError(error -> logger.error("Failed to retrieve all products", error));
     }
 }

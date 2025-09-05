@@ -1,6 +1,6 @@
 package com.meli.technical.exam.api.products.infrastructure.web;
 
-import com.meli.technical.exam.api.products.application.dto.response.ComparisonResponseDto;
+import com.meli.technical.exam.api.products.application.dto.response.comparison.ComparisonResponseDto;
 import com.meli.technical.exam.api.products.application.dto.response.PaginatedResponseDto;
 import com.meli.technical.exam.api.products.application.dto.request.ProductDto;
 import com.meli.technical.exam.api.products.application.usecase.ProductComparisonUseCase;

@@ -13,7 +13,6 @@ public class ProductBusinessRulesValidator implements ProductValidator {
     
     private static final Logger logger = LoggerFactory.getLogger(ProductBusinessRulesValidator.class);
     private static final BigDecimal MAX_PRICE = new BigDecimal("999999.99");
-    //Constantes podriamos ponerlas en otro archivo
     private static final double MIN_RATING = 0.0;
     private static final double MAX_RATING = 5.0;
     private static final int MAX_SPECIFICATIONS = 50;
