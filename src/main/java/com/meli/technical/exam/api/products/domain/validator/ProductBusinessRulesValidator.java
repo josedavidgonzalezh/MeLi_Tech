@@ -1,7 +1,7 @@
 package com.meli.technical.exam.api.products.domain.validator;
 
 import com.meli.technical.exam.api.products.domain.model.Product;
-import com.meli.technical.exam.api.products.shared.exception.InvalidProductException;
+import com.meli.technical.exam.api.products.domain.exception.InvalidProductException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -20,8 +20,8 @@ public class ProductBusinessRulesValidator implements ProductValidator {
 
     @Override
     public void validate(Product product) {
-        validatePrice(product.getPrice());
-        validateRating(product.getRating());
+        validatePrice(product.getPrice().getValue());
+        validateRating(product.getRating().getValue());
         validateSpecifications(product);
     }
 

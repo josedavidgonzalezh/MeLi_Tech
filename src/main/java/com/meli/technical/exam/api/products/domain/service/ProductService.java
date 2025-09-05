@@ -1,7 +1,7 @@
 package com.meli.technical.exam.api.products.domain.service;
 
 import com.meli.technical.exam.api.products.domain.model.Product;
-import com.meli.technical.exam.api.products.domain.port.ProductRepository;
+import com.meli.technical.exam.api.products.domain.repository.ProductRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

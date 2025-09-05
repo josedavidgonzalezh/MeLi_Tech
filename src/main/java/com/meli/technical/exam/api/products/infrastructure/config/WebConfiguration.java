@@ -1,4 +1,4 @@
-package com.meli.technical.exam.api.products.infrastructure.web;
+package com.meli.technical.exam.api.products.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

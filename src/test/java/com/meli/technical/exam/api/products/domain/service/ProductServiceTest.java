@@ -1,7 +1,7 @@
 package com.meli.technical.exam.api.products.domain.service;
 
 import com.meli.technical.exam.api.products.domain.model.Product;
-import com.meli.technical.exam.api.products.domain.port.ProductRepository;
+import com.meli.technical.exam.api.products.domain.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

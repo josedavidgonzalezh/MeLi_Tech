@@ -1,11 +1,12 @@
 package com.meli.technical.exam.api.products.application.usecase;
 
-import com.meli.technical.exam.api.products.application.dto.ComparisonResponseDto;
-import com.meli.technical.exam.api.products.application.dto.PaginatedResponseDto;
-import com.meli.technical.exam.api.products.application.dto.ProductDto;
+import com.meli.technical.exam.api.products.application.dto.response.ComparisonResponseDto;
+import com.meli.technical.exam.api.products.application.dto.response.PaginatedResponseDto;
+import com.meli.technical.exam.api.products.application.dto.request.ProductDto;
 import com.meli.technical.exam.api.products.application.mapper.ProductMapper;
 import com.meli.technical.exam.api.products.domain.service.ProductService;
-import com.meli.technical.exam.api.products.shared.exception.ProductNotFoundException;
+import com.meli.technical.exam.api.products.domain.service.ProductComparisonAnalyzer;
+import com.meli.technical.exam.api.products.domain.exception.ProductNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,10 +20,15 @@ public class ProductComparisonUseCase {
     private static final Logger logger = LoggerFactory.getLogger(ProductComparisonUseCase.class);
     private final ProductService productService;
     private final ProductMapper productMapper;
+    private final ProductComparisonAnalyzer comparisonAnalyzer;
+    private final int MAX_SIZE = 10;
+    private final int MAX_PAGE_SIZE = 100;
 
-    public ProductComparisonUseCase(ProductService productService, ProductMapper productMapper) {
+    public ProductComparisonUseCase(ProductService productService, ProductMapper productMapper, 
+                                   ProductComparisonAnalyzer comparisonAnalyzer) {
         this.productService = productService;
         this.productMapper = productMapper;
+        this.comparisonAnalyzer = comparisonAnalyzer;
     }
 
     public Mono<ProductDto> getProductById(String id) {
@@ -34,12 +40,11 @@ public class ProductComparisonUseCase {
 
     public Mono<ComparisonResponseDto> compareProducts(List<String> productIds) {
         if (productIds == null || productIds.isEmpty()) {
-            logger.warn("Empty or null product IDs provided for comparison");
-            return Mono.just(new ComparisonResponseDto(List.of(), List.of()));
+            return Mono.just(comparisonAnalyzer.analyzeProducts(List.of(), productIds));
         }
 
         //Constante puede ir en otro archivo
-        if (productIds.size() > 10) {
+        if (productIds.size() > MAX_SIZE) {
             return Mono.error(new IllegalArgumentException("Cannot compare more than 10 products at once"));
         }
 
@@ -47,21 +52,19 @@ public class ProductComparisonUseCase {
                 .map(productMapper::toDto)
                 .collectList()
                 .map(products -> {
-                    ComparisonResponseDto response = new ComparisonResponseDto(products, productIds);
-
                     if (products.size() < productIds.size()) {
                         logger.warn("Some products were not found. Requested: {}, Found: {}", 
                                    productIds.size(), products.size());
                     }
                     
-                    return response;
+                    return comparisonAnalyzer.analyzeProducts(products, productIds);
                 })
                 .doOnError(error -> logger.error("Failed to compare products: {}", productIds, error));
     }
 
     public Mono<PaginatedResponseDto<ProductDto>> getAllProductsPaginated(int page, int size) {
         
-        if (page < 0 || size <= 0 || size > 100) {
+        if (page < 0 || size <= 0 || size > MAX_PAGE_SIZE) {
             logger.warn("Invalid pagination parameters - page: {}, size: {}", page, size);
             return Mono.error(new IllegalArgumentException(
                 "Page must be non-negative, size must be positive and not exceed 100"));

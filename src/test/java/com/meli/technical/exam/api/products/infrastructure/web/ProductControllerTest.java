@@ -1,10 +1,11 @@
 package com.meli.technical.exam.api.products.infrastructure.web;
 
-import com.meli.technical.exam.api.products.application.dto.ComparisonResponseDto;
-import com.meli.technical.exam.api.products.application.dto.PaginatedResponseDto;
-import com.meli.technical.exam.api.products.application.dto.ProductDto;
+import com.meli.technical.exam.api.products.application.dto.response.ComparisonResponseDto;
+import com.meli.technical.exam.api.products.application.dto.response.PaginatedResponseDto;
+import com.meli.technical.exam.api.products.application.dto.request.ProductDto;
 import com.meli.technical.exam.api.products.application.usecase.ProductComparisonUseCase;
-import com.meli.technical.exam.api.products.shared.exception.ProductNotFoundException;
+import com.meli.technical.exam.api.products.infrastructure.adapter.in.web.ProductController;
+import com.meli.technical.exam.api.products.domain.exception.ProductNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;

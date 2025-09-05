@@ -1,4 +1,4 @@
-package com.meli.technical.exam.api.products.shared.exception;
+package com.meli.technical.exam.api.products.domain.exception;
 
 public class ProductDataException extends RuntimeException {
     

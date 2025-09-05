@@ -1,7 +1,7 @@
 package com.meli.technical.exam.api.products.domain.validator;
 
 import com.meli.technical.exam.api.products.domain.model.Product;
-import com.meli.technical.exam.api.products.shared.exception.InvalidProductException;
+import com.meli.technical.exam.api.products.domain.exception.InvalidProductException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -16,7 +16,7 @@ public class ProductInputFormatValidator implements ProductValidator {
 
     @Override
     public void validate(Product product) {
-        validateId(product.getId());
+        validateId(String.valueOf(product.getId()));
         validateName(product.getName());
         validateImageUrl(product.getImageUrl());
         validateDescription(product.getDescription());

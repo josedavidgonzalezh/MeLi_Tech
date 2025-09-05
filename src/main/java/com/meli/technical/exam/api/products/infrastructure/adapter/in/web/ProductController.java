@@ -1,8 +1,8 @@
-package com.meli.technical.exam.api.products.infrastructure.web;
+package com.meli.technical.exam.api.products.infrastructure.adapter.in.web;
 
-import com.meli.technical.exam.api.products.application.dto.ComparisonResponseDto;
-import com.meli.technical.exam.api.products.application.dto.PaginatedResponseDto;
-import com.meli.technical.exam.api.products.application.dto.ProductDto;
+import com.meli.technical.exam.api.products.application.dto.response.ComparisonResponseDto;
+import com.meli.technical.exam.api.products.application.dto.response.PaginatedResponseDto;
+import com.meli.technical.exam.api.products.application.dto.request.ProductDto;
 import com.meli.technical.exam.api.products.application.usecase.ProductComparisonUseCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +23,7 @@ public class ProductController {
     
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
     private final ProductComparisonUseCase productComparisonUseCase;
+    private static final int MAX_PAGE_SIZE = 100;
 
     public ProductController(ProductComparisonUseCase productComparisonUseCase) {
         this.productComparisonUseCase = productComparisonUseCase;
@@ -41,8 +42,8 @@ public class ProductController {
             @RequestParam("ids") String ids) {
         
         if (ids == null || ids.trim().isEmpty()) {
-            return Mono.just(ResponseEntity.badRequest()
-                    .body(new ComparisonResponseDto(List.of(), List.of())));
+            return productComparisonUseCase.compareProducts(List.of())
+                    .map(ResponseEntity::ok);
         }
 
         List<String> productIds = Arrays.asList(ids.split(","));
@@ -55,8 +56,8 @@ public class ProductController {
                 .toList();
 
         if (cleanIds.isEmpty()) {
-            return Mono.just(ResponseEntity.badRequest()
-                    .body(new ComparisonResponseDto(List.of(), List.of())));
+            return productComparisonUseCase.compareProducts(List.of())
+                    .map(ResponseEntity::ok);
         }
 
         return productComparisonUseCase.compareProducts(cleanIds)
@@ -71,17 +72,16 @@ public class ProductController {
         
         // Validate pagination parameters
         final int validatedPage = page < 0 ? 0 : page;
-        final int validatedSize = (size <= 0 || size > 100) ? 10 : size;
+        final int validatedSize = (size <= 0 || size > MAX_PAGE_SIZE) ? 10 : size;
         
         if (page < 0) {
             logger.warn("Invalid page parameter: {}. Using default page 0", page);
         }
         
-        if (size <= 0 || size > 100) {
+        if (size <= 0 || size > MAX_PAGE_SIZE) {
             logger.warn("Invalid size parameter: {}. Using default size 10", size);
         }
 
-        // If requesting first page with large size, return all products
         if (validatedPage == 0 && validatedSize >= 50) {
             return productComparisonUseCase.getAllProducts()
                     .map(ResponseEntity::ok)

@@ -1,4 +1,4 @@
-package com.meli.technical.exam.api.products.application.dto;
+package com.meli.technical.exam.api.products.application.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;

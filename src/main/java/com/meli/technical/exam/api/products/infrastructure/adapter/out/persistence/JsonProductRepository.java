@@ -1,12 +1,12 @@
-package com.meli.technical.exam.api.products.infrastructure.persistence;
+package com.meli.technical.exam.api.products.infrastructure.adapter.out.persistence;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.meli.technical.exam.api.products.application.dto.ProductDto;
+import com.meli.technical.exam.api.products.application.dto.request.ProductDto;
 import com.meli.technical.exam.api.products.application.mapper.ProductMapper;
+import com.meli.technical.exam.api.products.domain.repository.ProductRepository;
 import com.meli.technical.exam.api.products.domain.model.Product;
-import com.meli.technical.exam.api.products.domain.port.ProductRepository;
-import com.meli.technical.exam.api.products.shared.exception.ProductDataException;
+import com.meli.technical.exam.api.products.domain.exception.ProductDataException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -55,7 +55,7 @@ public class JsonProductRepository implements ProductRepository {
                 
                 for (ProductDto dto : productDtos) {
                     Product product = productMapper.toDomain(dto);
-                    productsCache.put(product.getId(), product);
+                    productsCache.put(product.getId().getValue(), product);
                 }
             }
             

@@ -1,4 +1,4 @@
-package com.meli.technical.exam.api.products.domain.port;
+package com.meli.technical.exam.api.products.domain.repository;
 
 import com.meli.technical.exam.api.products.domain.model.Product;
 import reactor.core.publisher.Flux;
