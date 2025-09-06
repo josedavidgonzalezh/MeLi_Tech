@@ -22,8 +22,8 @@ public class ProductComparisonUseCase {
     private final ProductService productService;
     private final ProductMapper productMapper;
     private final ProductComparisonAnalyzerService comparisonAnalyzer;
-    private final int MAX_SIZE = 10;
-    private final int MAX_PAGE_SIZE = 100;
+    private static final int MAX_SIZE = 10;
+    private static final int MAX_PAGE_SIZE = 100;
 
     public ProductComparisonUseCase(ProductService productService, ProductMapper productMapper, 
                                    ProductComparisonAnalyzerService comparisonAnalyzer) {
@@ -76,11 +76,7 @@ public class ProductComparisonUseCase {
                     productService.findAllPaginated(page, size)
                             .map(productMapper::toDto)
                             .collectList()
-                            .map(products -> {
-                                PaginatedResponseDto<ProductDto> response = 
-                                    new PaginatedResponseDto<>(products, page, size, totalElements);
-                                return response;
-                            })
+                            .map(products -> new PaginatedResponseDto<>(products, page, size, totalElements))
                 )
                 .doOnError(error -> logger.error("Failed to get paginated products", error));
     }
@@ -91,11 +87,7 @@ public class ProductComparisonUseCase {
                     productService.findAll()
                             .map(productMapper::toDto)
                             .collectList()
-                            .map(products -> {
-                                PaginatedResponseDto<ProductDto> response = 
-                                    new PaginatedResponseDto<>(products, 0, products.size(), totalElements);
-                                return response;
-                            })
+                            .map(products -> new PaginatedResponseDto<>(products, 0, products.size(), totalElements))
                 )
                 .doOnError(error -> logger.error("Failed to get all products", error));
     }

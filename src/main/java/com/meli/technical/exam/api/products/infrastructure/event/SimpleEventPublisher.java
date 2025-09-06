@@ -16,7 +16,6 @@ public class SimpleEventPublisher implements DomainEventPublisher {
     @Override
     public void publish(DomainEvent event) {
         logger.info("Publishing domain event: {} - {}", event.getEventType(), event.getEventId());
-        logger.debug("Event details: {}", event.toString());
     }
     
     @Override

@@ -36,22 +36,14 @@ public class ProductComparisonAnalyzerService {
         this.recommendationEngine = recommendationEngine;
         this.summaryGenerationStrategy = summaryGenerationStrategy;
     }
-    
-    /**
-     * Reactive version - preferred method
-     */
+
     public Mono<ComparisonResponseDto> analyzeProductsReactive(Flux<ProductDto> productFlux, List<String> requestedIds) {
         return productFlux
                 .collectList()
                 .flatMap(products -> analyzeProductsFromList(products, requestedIds))
-                .doOnSubscribe(subscription -> logger.debug("Starting reactive product analysis"))
-                .doOnSuccess(result -> logger.debug("Completed reactive analysis for {} products", result.getTotalProducts()))
                 .doOnError(error -> logger.error("Error during reactive product analysis", error));
     }
-    
-    /**
-     * Legacy method - kept for backward compatibility (now reactive)
-     */
+
     public Mono<ComparisonResponseDto> analyzeProducts(List<ProductDto> products, List<String> requestedIds) {
         return analyzeProductsFromList(products, requestedIds);
     }

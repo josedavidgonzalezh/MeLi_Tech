@@ -9,114 +9,105 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ProductStatsCollector {
-    
+
     public static ProductStats collectStats(List<ProductDto> products) {
         if (products == null || products.isEmpty()) {
             return ProductStats.createEmpty();
         }
-        
-        // Single-pass collection of all statistics
-        ProductDto cheapest = null;
-        ProductDto mostExpensive = null;
-        ProductDto bestRated = null;
-        ProductDto lowestRated = null;
-        ProductDto mostFeatured = null;
-        
-        BigDecimal totalPrice = BigDecimal.ZERO;
-        double totalRating = 0.0;
-        int maxSpecifications = 0;
-        
-        Map<String, BigDecimal> priceDistribution = new HashMap<>();
-        Map<String, Double> ratingDistribution = new HashMap<>();
-        Map<String, Set<String>> productSpecifications = new HashMap<>();
-        Set<String> allSpecKeys = new HashSet<>();
-        List<ProductDto> highlyRated = new ArrayList<>();
-        
-        // Single iteration over all products
-        for (ProductDto product : products) {
-            BigDecimal price = product.getPrice();
-            Double rating = product.getRating();
-            List<SpecificationDto> specs = product.getSpecifications() != null ? 
-                    product.getSpecifications() : Collections.emptyList();
-            
-            // Price analysis
-            totalPrice = totalPrice.add(price);
-            priceDistribution.put(product.getName(), price);
-            
-            if (cheapest == null || price.compareTo(cheapest.getPrice()) < 0) {
-                cheapest = product;
-            }
-            if (mostExpensive == null || price.compareTo(mostExpensive.getPrice()) > 0) {
-                mostExpensive = product;
-            }
-            
-            // Rating analysis
-            totalRating += rating;
-            ratingDistribution.put(product.getName(), rating);
-            
-            if (bestRated == null || rating > bestRated.getRating()) {
-                bestRated = product;
-            }
-            if (lowestRated == null || rating < lowestRated.getRating()) {
-                lowestRated = product;
-            }
-            
-            if (rating >= 4.5) {
-                highlyRated.add(product);
-            }
-            
-            // Specification analysis
-            Set<String> productSpecKeys = specs.stream()
-                    .map(SpecificationDto::getKey)
-                    .collect(Collectors.toSet());
-            
-            productSpecifications.put(product.getName(), productSpecKeys);
-            allSpecKeys.addAll(productSpecKeys);
-            
-            if (specs.size() > maxSpecifications) {
-                maxSpecifications = specs.size();
-                mostFeatured = product;
-            }
-        }
-        
-        // Calculate derived statistics
-        int productCount = products.size();
-        BigDecimal averagePrice = totalPrice.divide(BigDecimal.valueOf(productCount), 2, RoundingMode.HALF_UP);
-        Double averageRating = totalRating / productCount;
+
+        int count = products.size();
+
+        // Price stats
+        ProductDto cheapest = products.stream()
+                .min(Comparator.comparing(ProductDto::getPrice))
+                .orElse(null);
+
+        ProductDto mostExpensive = products.stream()
+                .max(Comparator.comparing(ProductDto::getPrice))
+                .orElse(null);
+
+        BigDecimal totalPrice = products.stream()
+                .map(ProductDto::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal avgPrice = totalPrice.divide(BigDecimal.valueOf(count), 2, RoundingMode.HALF_UP);
+
         BigDecimal priceRange = mostExpensive.getPrice().subtract(cheapest.getPrice());
-        Double ratingRange = bestRated.getRating() - lowestRated.getRating();
-        
-        // Find common specifications
+
+        Map<String, BigDecimal> priceDistribution =
+                products.stream().collect(Collectors.toMap(ProductDto::getName, ProductDto::getPrice));
+
+        // Rating stats
+        ProductDto bestRated = products.stream()
+                .max(Comparator.comparing(ProductDto::getRating))
+                .orElse(null);
+
+        ProductDto lowestRated = products.stream()
+                .min(Comparator.comparing(ProductDto::getRating))
+                .orElse(null);
+
+        double totalRating = products.stream()
+                .mapToDouble(ProductDto::getRating)
+                .sum();
+
+        double avgRating = Math.round((totalRating / count) * 10.0) / 10.0;
+
+        double ratingRange = bestRated.getRating() - lowestRated.getRating();
+
+        Map<String, Double> ratingDistribution =
+                products.stream().collect(Collectors.toMap(ProductDto::getName, ProductDto::getRating));
+
+        List<ProductDto> highlyRated =
+                products.stream().filter(p -> p.getRating() >= 4.5).toList();
+
+        // Specs stats
+        ProductDto mostFeatured = products.stream()
+                .max(Comparator.comparingInt(p ->
+                        Optional.ofNullable(p.getSpecifications()).orElse(List.of()).size()))
+                .orElse(null);
+
+        Map<String, Set<String>> productSpecifications = products.stream()
+                .collect(Collectors.toMap(ProductDto::getName,
+                        p -> Optional.ofNullable(p.getSpecifications()).orElse(List.of())
+                                .stream().map(SpecificationDto::getKey).collect(Collectors.toSet())
+                ));
+
+        Set<String> allSpecKeys = productSpecifications.values()
+                .stream()
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
+
         Set<String> commonSpecs = findCommonSpecifications(products, allSpecKeys);
-        
+
+        // Build result
         return ProductStats.builder()
                 .cheapestProduct(cheapest)
                 .mostExpensiveProduct(mostExpensive)
                 .totalPrice(totalPrice)
-                .averagePrice(averagePrice)
+                .averagePrice(avgPrice)
                 .priceRange(priceRange)
                 .bestRatedProduct(bestRated)
                 .lowestRatedProduct(lowestRated)
                 .totalRating(totalRating)
-                .averageRating(Math.round(averageRating * 10.0) / 10.0)
+                .averageRating(avgRating)
                 .ratingRange(ratingRange)
                 .allSpecificationKeys(allSpecKeys)
                 .commonSpecifications(commonSpecs)
                 .mostFeaturedProduct(mostFeatured)
                 .productSpecifications(productSpecifications)
-                .totalProducts(productCount)
+                .totalProducts(count)
                 .allProducts(products)
                 .highlyRatedProducts(highlyRated)
                 .priceDistribution(priceDistribution)
                 .ratingDistribution(ratingDistribution)
                 .build();
     }
-    
+
     private static Set<String> findCommonSpecifications(List<ProductDto> products, Set<String> allSpecKeys) {
         return allSpecKeys.stream()
                 .filter(specKey -> products.stream()
-                        .allMatch(product -> product.getSpecifications().stream()
-                                .anyMatch(spec -> spec.getKey().equals(specKey))))
+                        .allMatch(p -> Optional.ofNullable(p.getSpecifications()).orElse(List.of())
+                                .stream().anyMatch(spec -> spec.getKey().equals(specKey))))
                 .collect(Collectors.toSet());
     }
 }

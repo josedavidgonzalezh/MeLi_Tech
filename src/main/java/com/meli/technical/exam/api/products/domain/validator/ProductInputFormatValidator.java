@@ -2,8 +2,6 @@ package com.meli.technical.exam.api.products.domain.validator;
 
 import com.meli.technical.exam.api.products.domain.exception.InvalidProductException;
 import com.meli.technical.exam.api.products.domain.model.Product;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.net.MalformedURLException;
@@ -11,8 +9,6 @@ import java.net.URL;
 
 @Component
 public class ProductInputFormatValidator implements ProductValidator {
-    
-    private static final Logger logger = LoggerFactory.getLogger(ProductInputFormatValidator.class);
 
     @Override
     public void validate(Product product) {

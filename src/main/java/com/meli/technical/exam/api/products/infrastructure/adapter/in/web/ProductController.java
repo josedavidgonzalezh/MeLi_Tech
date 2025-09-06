@@ -85,9 +85,7 @@ public class ProductController {
         }
 
         return productComparisonUseCase.getAllProductsPaginated(validatedPage, validatedSize)
-                .map(response -> {
-                    return ResponseEntity.ok(response);
-                })
+                .map(ResponseEntity::ok)
                 .doOnError(error -> logger.error("Error retrieving paginated products", error));
     }
 
