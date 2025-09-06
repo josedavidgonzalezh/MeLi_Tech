@@ -4,12 +4,11 @@ import com.meli.technical.exam.api.products.domain.model.Product;
 
 public interface ProductValidator {
     void validate(Product product);
-    
     default boolean isValid(Product product) {
         try {
             validate(product);
             return true;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return false;
         }
     }

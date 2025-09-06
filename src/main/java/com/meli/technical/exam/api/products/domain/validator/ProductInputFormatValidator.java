@@ -16,7 +16,10 @@ public class ProductInputFormatValidator implements ProductValidator {
 
     @Override
     public void validate(Product product) {
-        validateId(String.valueOf(product.getId()));
+        if (product == null) {
+            throw new InvalidProductException("Product cannot be null");
+        }
+        validateId(product.getId() != null ? product.getId().getValue() : null);
         validateName(product.getName());
         validateImageUrl(product.getImageUrl());
         validateDescription(product.getDescription());
@@ -26,15 +29,13 @@ public class ProductInputFormatValidator implements ProductValidator {
         if (id == null || id.trim().isEmpty()) {
             throw new InvalidProductException("Product ID cannot be null or empty");
         }
-        
         String trimmedId = id.trim();
         if (trimmedId.length() > 50) {
             throw new InvalidProductException("Product ID cannot exceed 50 characters");
         }
-        
         if (!trimmedId.matches("^[a-zA-Z0-9\\-_]+$")) {
             throw new InvalidProductException(
-                "Product ID can only contain letters, numbers, hyphens, and underscores"
+                    "Product ID can only contain letters, numbers, hyphens, and underscores"
             );
         }
     }

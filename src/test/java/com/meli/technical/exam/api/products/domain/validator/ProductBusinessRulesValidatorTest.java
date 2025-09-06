@@ -1,12 +1,15 @@
 package com.meli.technical.exam.api.products.domain.validator;
 
-import com.meli.technical.exam.api.products.domain.factory.ProductTestFactory;
 import com.meli.technical.exam.api.products.domain.model.Product;
+import com.meli.technical.exam.api.products.domain.model.ProductId;
+import com.meli.technical.exam.api.products.domain.model.Price;
+import com.meli.technical.exam.api.products.domain.model.Rating;
 import com.meli.technical.exam.api.products.domain.exception.InvalidProductException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,12 +25,12 @@ class ProductBusinessRulesValidatorTest {
     @Test
     void shouldPassValidationForValidProduct() {
         Product product = Product.builder()
-                .id("1")
+                .id(ProductId.of("1"))
                 .name("Test Product")
                 .imageUrl("https://example.com/image.jpg")
                 .description("Test description")
-                .price(new BigDecimal("99.99"))
-                .rating(4.5)
+                .price(Price.of(new BigDecimal("99.99")))
+                .rating(Rating.of(4.5))
                 .specifications(List.of())
                 .build();
 
@@ -36,90 +39,72 @@ class ProductBusinessRulesValidatorTest {
     }
 
     @Test
-    void shouldFailValidationWhenPriceIsNull() {
-        Product product = Product.builder()
-                .id("1")
-                .name("Test Product")
-                .price(null)
-                .rating(4.5)
-                .build();
-
-        InvalidProductException exception = assertThrows(InvalidProductException.class, 
-                () -> validator.validate(product));
-        assertEquals("Product price cannot be null", exception.getMessage());
-        assertFalse(validator.isValid(product));
+    void shouldFailValidationWhenProductIsNull() {
+        assertThrows(NullPointerException.class, () -> validator.validate(null));
+        assertFalse(validator.isValid(null));
     }
 
     @Test
-    void shouldFailValidationWhenPriceIsNegative() {
-        Product product = Product.builder()
-                .id("1")
-                .name("Test Product")
-                .price(new BigDecimal("-10.00"))
-                .rating(4.5)
-                .build();
-
-        InvalidProductException exception = assertThrows(InvalidProductException.class, 
-                () -> validator.validate(product));
-        assertEquals("Product price cannot be negative", exception.getMessage());
+    void shouldFailValidationWhenIdIsNull() {
+        assertThrows(NullPointerException.class, () -> {
+            Product.builder()
+                    .id(null)
+                    .name("Test Product")
+                    .imageUrl("url")
+                    .description("desc")
+                    .price(Price.of(new BigDecimal("99.99")))
+                    .rating(Rating.of(4.5))
+                    .specifications(List.of())
+                    .build();
+        });
     }
 
     @Test
-    void shouldFailValidationWhenPriceExceedsMaximum() {
-        Product product = Product.builder()
-                .id("1")
-                .name("Test Product")
-                .price(new BigDecimal("1000000.00"))
-                .rating(4.5)
-                .build();
-
-        InvalidProductException exception = assertThrows(InvalidProductException.class, 
-                () -> validator.validate(product));
-        assertTrue(exception.getMessage().contains("cannot exceed"));
+    void shouldFailValidationWhenNameIsEmpty() {
+        assertThrows(InvalidProductException.class, () -> {
+            Product.builder()
+                    .id(ProductId.of("1"))
+                    .name("")
+                    .imageUrl("url")
+                    .description("desc")
+                    .price(Price.of(new BigDecimal("99.99")))
+                    .rating(Rating.of(4.5))
+                    .specifications(List.of())
+                    .build();
+        });
     }
 
     @Test
-    void shouldFailValidationWhenRatingIsNull() {
-        Product product = Product.builder()
-                .id("1")
-                .name("Test Product")
-                .price(new BigDecimal("99.99"))
-                .rating(null)
-                .build();
-
-        InvalidProductException exception = assertThrows(InvalidProductException.class, 
-                () -> validator.validate(product));
-        assertEquals("Product rating cannot be null", exception.getMessage());
+    void shouldFailValidationWhenPriceIsInvalid() {
+        assertThrows(InvalidProductException.class, () -> {
+            Price.of(new BigDecimal("-10.00"));
+        });
     }
 
     @Test
-    void shouldFailValidationWhenRatingIsOutOfRange() {
-        Product product = Product.builder()
-                .id("1")
-                .name("Test Product")
-                .price(new BigDecimal("99.99"))
-                .rating(6.0)
-                .build();
-
-        InvalidProductException exception = assertThrows(InvalidProductException.class, 
-                () -> validator.validate(product));
-        assertTrue(exception.getMessage().contains("must be between"));
-
-        Product productWithNegativeRating = product.toBuilder().rating(-1.0).build();
-        assertThrows(InvalidProductException.class, () -> validator.validate(productWithNegativeRating));
+    void shouldFailValidationWhenRatingIsInvalid() {
+        assertThrows(InvalidProductException.class, () -> {
+            Rating.of(6.0);
+        });
+        
+        assertThrows(InvalidProductException.class, () -> {
+            Rating.of(-1.0);
+        });
     }
 
     @Test
-    void shouldFailValidationWhenPriceHasTooManyDecimals() {
-        Product product = Product.builder()
-                .id("1")
-                .name("Test Product")
-                .price(new BigDecimal("99.999"))
-                .rating(4.5)
-                .build();
+    void shouldValidatePriceRange() {
+        assertDoesNotThrow(() -> Price.of(new BigDecimal("0.01")));
+        assertDoesNotThrow(() -> Price.of(new BigDecimal("999999.99")));
+        
+        assertThrows(InvalidProductException.class, () -> 
+            Price.of(new BigDecimal("1000000.00")));
+    }
 
-        InvalidProductException exception = assertThrows(InvalidProductException.class, 
-                () -> validator.validate(product));
-        assertTrue(exception.getMessage().contains("decimal places"));
+    @Test
+    void shouldValidateRatingRange() {
+        assertDoesNotThrow(() -> Rating.of(0.0));
+        assertDoesNotThrow(() -> Rating.of(5.0));
+        assertDoesNotThrow(() -> Rating.of(2.5));
     }
 }

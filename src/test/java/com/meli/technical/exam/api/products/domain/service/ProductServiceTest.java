@@ -1,6 +1,9 @@
 package com.meli.technical.exam.api.products.domain.service;
 
 import com.meli.technical.exam.api.products.domain.model.Product;
+import com.meli.technical.exam.api.products.domain.model.ProductId;
+import com.meli.technical.exam.api.products.domain.model.Price;
+import com.meli.technical.exam.api.products.domain.model.Rating;
 import com.meli.technical.exam.api.products.domain.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,10 +31,15 @@ class ProductServiceTest {
     @BeforeEach
     void setUp() {
         productService = new ProductService(productRepository);
-        testProduct = new Product(
-            "1", "Test Product", "url", "desc", 
-            new BigDecimal("99.99"), 4.5, List.of()
-        );
+        testProduct = Product.builder()
+                .id(ProductId.of("1"))
+                .name("Test Product")
+                .imageUrl("url")
+                .description("desc")
+                .price(Price.of(new BigDecimal("99.99")))
+                .rating(Rating.of(4.5))
+                .specifications(List.of())
+                .build();
     }
 
     @Test
@@ -58,10 +66,15 @@ class ProductServiceTest {
     @Test
     void shouldFindProductsForComparison() {
         List<String> productIds = List.of("1", "2");
-        Product product2 = new Product(
-            "2", "Product 2", "url2", "desc2", 
-            new BigDecimal("199.99"), 4.0, List.of()
-        );
+        Product product2 = Product.builder()
+                .id(ProductId.of("2"))
+                .name("Product 2")
+                .imageUrl("url2")
+                .description("desc2")
+                .price(Price.of(new BigDecimal("199.99")))
+                .rating(Rating.of(4.0))
+                .specifications(List.of())
+                .build();
 
         when(productRepository.findByIds(productIds))
                 .thenReturn(Flux.just(testProduct, product2));

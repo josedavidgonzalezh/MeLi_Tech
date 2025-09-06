@@ -27,7 +27,4 @@ public class Price {
     public static Price of(BigDecimal value) { return new Price(value); }
     public static Price of(String value) { return new Price(new BigDecimal(value)); }
     public static Price of(double value) { return new Price(BigDecimal.valueOf(value)); }
-    public boolean isGreaterThan(Price other) { return this.value.compareTo(other.value) > 0; }
-    public boolean isLessThan(Price other) { return this.value.compareTo(other.value) < 0; }
-    public boolean isEqualTo(Price other) { return this.value.compareTo(other.value) == 0; }
 }

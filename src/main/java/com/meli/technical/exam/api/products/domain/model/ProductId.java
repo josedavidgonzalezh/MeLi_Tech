@@ -27,6 +27,7 @@ public class ProductId {
         return new ProductId(trimmedValue);
     }
 
+    //For the future to POST new items and generate randoms GUID
     public static ProductId generate() {
         return new ProductId(UUID.randomUUID().toString());
     }

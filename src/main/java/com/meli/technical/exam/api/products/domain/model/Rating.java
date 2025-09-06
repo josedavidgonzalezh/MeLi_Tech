@@ -43,20 +43,8 @@ public class Rating {
         }
     }
 
-    public static Rating maximum() {
-        return new Rating(BigDecimal.valueOf(MAX_RATING));
-    }
-
     public Double getValue() {
         return value.doubleValue();
-    }
-
-    public boolean isHigherThan(Rating other) {
-        return this.value.compareTo(other.value) > 0;
-    }
-
-    public boolean isLowerThan(Rating other) {
-        return this.value.compareTo(other.value) < 0;
     }
 
 }

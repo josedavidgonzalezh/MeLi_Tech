@@ -1,4 +1,4 @@
-package com.meli.technical.exam.api.products.infrastructure.persistence;
+package com.meli.technical.exam.api.products.infrastructure.adapter.out.persistence;
 
 import org.junit.jupiter.api.Test;
 
