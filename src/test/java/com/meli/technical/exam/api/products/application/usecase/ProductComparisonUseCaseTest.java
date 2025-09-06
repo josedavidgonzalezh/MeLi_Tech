@@ -127,7 +127,7 @@ class ProductComparisonUseCaseTest {
                 .thenReturn(Flux.just(testProduct1, testProduct2));
         when(productMapper.toDto(testProduct1)).thenReturn(testProductDto1);
         when(productMapper.toDto(testProduct2)).thenReturn(testProductDto2);
-        when(comparisonAnalyzer.analyzeProducts(any(), eq(productIds)))
+        when(comparisonAnalyzer.analyzeProductsReactive(any(), eq(productIds)))
                 .thenReturn(Mono.just(expectedResponse));
 
         // When & Then
@@ -138,7 +138,7 @@ class ProductComparisonUseCaseTest {
         verify(productService).findProductsForComparison(productIds);
         verify(productMapper).toDto(testProduct1);
         verify(productMapper).toDto(testProduct2);
-        verify(comparisonAnalyzer).analyzeProducts(any(), eq(productIds));
+        verify(comparisonAnalyzer).analyzeProductsReactive(any(), eq(productIds));
     }
 
     @Test
@@ -159,7 +159,7 @@ class ProductComparisonUseCaseTest {
                 .thenReturn(Flux.just(testProduct1, testProduct2)); // Only 2 products found
         when(productMapper.toDto(testProduct1)).thenReturn(testProductDto1);
         when(productMapper.toDto(testProduct2)).thenReturn(testProductDto2);
-        when(comparisonAnalyzer.analyzeProducts(foundProducts, requestedIds))
+        when(comparisonAnalyzer.analyzeProductsReactive(any(), eq(requestedIds)))
                 .thenReturn(Mono.just(expectedResponse));
 
         // When & Then
@@ -168,7 +168,7 @@ class ProductComparisonUseCaseTest {
                 .verifyComplete();
 
         verify(productService).findProductsForComparison(requestedIds);
-        verify(comparisonAnalyzer).analyzeProducts(foundProducts, requestedIds);
+        verify(comparisonAnalyzer).analyzeProductsReactive(any(), eq(requestedIds));
     }
 
     @Test
@@ -182,7 +182,7 @@ class ProductComparisonUseCaseTest {
                 .comparisonTimestamp(Instant.now())
                 .build();
 
-        when(comparisonAnalyzer.analyzeProducts(List.of(), emptyIds))
+        when(comparisonAnalyzer.analyzeProductsReactive(any(), eq(emptyIds)))
                 .thenReturn(Mono.just(emptyResponse));
 
         // When & Then
@@ -190,7 +190,7 @@ class ProductComparisonUseCaseTest {
                 .expectNext(emptyResponse)
                 .verifyComplete();
 
-        verify(comparisonAnalyzer).analyzeProducts(List.of(), emptyIds);
+        verify(comparisonAnalyzer).analyzeProductsReactive(any(), eq(emptyIds));
         verifyNoInteractions(productService, productMapper);
     }
 
@@ -204,7 +204,7 @@ class ProductComparisonUseCaseTest {
                 .comparisonTimestamp(Instant.now())
                 .build();
 
-        when(comparisonAnalyzer.analyzeProducts(List.of(), null))
+        when(comparisonAnalyzer.analyzeProductsReactive(any(), eq((List<String>) null)))
                 .thenReturn(Mono.just(emptyResponse));
 
         // When & Then
@@ -212,7 +212,7 @@ class ProductComparisonUseCaseTest {
                 .expectNext(emptyResponse)
                 .verifyComplete();
 
-        verify(comparisonAnalyzer).analyzeProducts(List.of(), null);
+        verify(comparisonAnalyzer).analyzeProductsReactive(any(), eq((List<String>) null));
         verifyNoInteractions(productService, productMapper);
     }
 

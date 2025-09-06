@@ -11,6 +11,7 @@ import com.meli.technical.exam.api.products.domain.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class ProductComparisonUseCase {
     private final ProductService productService;
     private final ProductMapper productMapper;
     private final ProductComparisonAnalyzerService comparisonAnalyzer;
-    private static final int MAX_SIZE = 10;
+    private static final int MAX_COMPARE_SIZE = 10;
     private static final int MAX_PAGE_SIZE = 100;
 
     public ProductComparisonUseCase(ProductService productService, ProductMapper productMapper, 
@@ -41,24 +42,24 @@ public class ProductComparisonUseCase {
 
     public Mono<ComparisonResponseDto> compareProducts(List<String> productIds) {
         if (productIds == null || productIds.isEmpty()) {
-            return comparisonAnalyzer.analyzeProducts(List.of(), productIds);
+            return comparisonAnalyzer.analyzeProductsReactive(Flux.empty(), productIds);
         }
 
-        //Constante puede ir en otro archivo
-        if (productIds.size() > MAX_SIZE) {
+        if (productIds.size() > MAX_COMPARE_SIZE) {
             return Mono.error(new IllegalArgumentException("Cannot compare more than 10 products at once"));
         }
 
         return productService.findProductsForComparison(productIds)
                 .map(productMapper::toDto)
-                .collectList()
-                .flatMap(products -> {
-                    if (products.size() < productIds.size()) {
-                        logger.warn("Some products were not found. Requested: {}, Found: {}", 
-                                   productIds.size(), products.size());
-                    }
-                    
-                    return comparisonAnalyzer.analyzeProducts(products, productIds);
+                .as(productFlux -> {
+                    return productFlux.collectList()
+                            .doOnNext(products -> {
+                                if (products.size() < productIds.size()) {
+                                    logger.warn("Some products were not found. Requested: {}, Found: {}", 
+                                               productIds.size(), products.size());
+                                }
+                            })
+                            .flatMap(products -> comparisonAnalyzer.analyzeProductsReactive(Flux.fromIterable(products), productIds));
                 })
                 .doOnError(error -> logger.error("Failed to compare products: {}", productIds, error));
     }

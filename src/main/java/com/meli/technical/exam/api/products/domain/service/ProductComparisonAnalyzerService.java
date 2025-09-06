@@ -44,9 +44,6 @@ public class ProductComparisonAnalyzerService {
                 .doOnError(error -> logger.error("Error during reactive product analysis", error));
     }
 
-    public Mono<ComparisonResponseDto> analyzeProducts(List<ProductDto> products, List<String> requestedIds) {
-        return analyzeProductsFromList(products, requestedIds);
-    }
     
     private Mono<ComparisonResponseDto> analyzeProductsFromList(List<ProductDto> products, List<String> requestedIds) {
         if (products == null || products.isEmpty()) {

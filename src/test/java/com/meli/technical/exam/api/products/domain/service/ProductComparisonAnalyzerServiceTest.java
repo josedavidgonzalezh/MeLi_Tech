@@ -149,7 +149,7 @@ class ProductComparisonAnalyzerServiceTest {
                 ComparisonSummaryDto.builder().conclusion("Good comparison").build()));
 
         // When & Then
-        StepVerifier.create(analyzerService.analyzeProducts(products, requestedIds))
+        StepVerifier.create(analyzerService.analyzeProductsReactive(Flux.fromIterable(products), requestedIds))
                 .assertNext(result -> {
                     assertNotNull(result);
                     assertEquals(2, result.getTotalProducts());
@@ -165,7 +165,7 @@ class ProductComparisonAnalyzerServiceTest {
         List<ProductDto> emptyProducts = List.of();
 
         // When & Then
-        StepVerifier.create(analyzerService.analyzeProducts(emptyProducts, requestedIds))
+        StepVerifier.create(analyzerService.analyzeProductsReactive(Flux.fromIterable(emptyProducts), requestedIds))
                 .assertNext(result -> {
                     assertNotNull(result);
                     assertEquals(0, result.getTotalProducts());
@@ -188,7 +188,7 @@ class ProductComparisonAnalyzerServiceTest {
     @Test
     void shouldReturnEmptyResponseWhenProductsListIsNull() {
         // When & Then
-        StepVerifier.create(analyzerService.analyzeProducts(null, requestedIds))
+        StepVerifier.create(analyzerService.analyzeProductsReactive(Flux.empty(), requestedIds))
                 .assertNext(result -> {
                     assertNotNull(result);
                     assertEquals(0, result.getTotalProducts());
@@ -211,7 +211,7 @@ class ProductComparisonAnalyzerServiceTest {
         when(priceAnalysisStrategy.analyze(any())).thenReturn(Mono.error(analysisError));
 
         // When & Then
-        StepVerifier.create(analyzerService.analyzeProducts(products, requestedIds))
+        StepVerifier.create(analyzerService.analyzeProductsReactive(Flux.fromIterable(products), requestedIds))
                 .expectError(RuntimeException.class)
                 .verify();
     }
@@ -247,7 +247,7 @@ class ProductComparisonAnalyzerServiceTest {
                 ComparisonSummaryDto.builder().conclusion("Single product analysis").build()));
 
         // When & Then
-        StepVerifier.create(analyzerService.analyzeProducts(singleProduct, List.of("1")))
+        StepVerifier.create(analyzerService.analyzeProductsReactive(Flux.fromIterable(singleProduct), List.of("1")))
                 .assertNext(result -> {
                     assertNotNull(result);
                     assertEquals(1, result.getTotalProducts());
