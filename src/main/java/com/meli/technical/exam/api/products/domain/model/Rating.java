@@ -7,6 +7,12 @@ import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+/*
+* Validations on this class can be separeted into another helper or utils class however
+* we keep the validations because it makes sense and helps the reader know exactly the
+* constraints within the class
+* */
+
 @Getter
 @EqualsAndHashCode
 @ToString

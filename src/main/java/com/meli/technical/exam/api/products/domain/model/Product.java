@@ -9,6 +9,12 @@ import lombok.ToString;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/*
+ * Validations on this class can be separeted into another helper or utils class however
+ * we keep the validations because it makes sense and helps the reader know exactly the
+ * constraints within the class
+ * */
+
 @Getter
 @EqualsAndHashCode(of = "id")
 @ToString
