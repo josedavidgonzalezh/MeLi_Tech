@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/*this would be more useful when implementig the POST and PUT methods, to interect with the repo*/
 @Repository
 public class JsonProductRepository implements ProductRepository {
     

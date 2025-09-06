@@ -937,9 +937,21 @@ public class ProductAnalyticsService {
 // Event Sourcing for Analytics
 @EventSourcing
 public class ProductEventStore {
-    // Store all domain events for analysis
-    // Replay events for analytics
-    // Time-series data for trends
+    // Store all domain events for analysis and audit trail
+    // Persistent storage of ProductComparedEvent, ProductViewedEvent, ProductUpdatedEvent
+    // Replay events for analytics and historical reconstruction
+    // Time-series data for trends and business intelligence
+    // Event versioning for schema evolution
+}
+
+// Domain Event Storage Strategy
+@Component
+public class DatabaseEventStoreStrategy implements EventStoreStrategy {
+    // MongoDB event storage with indexing
+    // Event serialization/deserialization with Jackson
+    // Efficient querying by event type, aggregate ID, timestamp
+    // Automatic event retention policies for storage optimization
+    // Event streaming for real-time analytics dashboards
 }
 ```
 

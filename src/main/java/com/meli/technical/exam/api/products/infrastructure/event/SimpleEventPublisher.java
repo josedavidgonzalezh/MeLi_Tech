@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-
+/*Same for this domain event, it will make sense when implementing the DB*/
 @Component
 public class SimpleEventPublisher implements DomainEventPublisher {
     
