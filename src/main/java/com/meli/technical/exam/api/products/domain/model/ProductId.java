@@ -4,6 +4,7 @@ import com.meli.technical.exam.api.products.domain.exception.InvalidProductExcep
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+
 import java.util.UUID;
 
 @Getter

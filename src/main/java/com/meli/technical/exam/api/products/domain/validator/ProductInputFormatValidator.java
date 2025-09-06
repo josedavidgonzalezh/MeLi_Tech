@@ -1,7 +1,7 @@
 package com.meli.technical.exam.api.products.domain.validator;
 
-import com.meli.technical.exam.api.products.domain.model.Product;
 import com.meli.technical.exam.api.products.domain.exception.InvalidProductException;
+import com.meli.technical.exam.api.products.domain.model.Product;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

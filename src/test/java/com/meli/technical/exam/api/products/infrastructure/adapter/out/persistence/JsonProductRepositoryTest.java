@@ -2,7 +2,7 @@ package com.meli.technical.exam.api.products.infrastructure.adapter.out.persiste
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JsonProductRepositoryTest {
 

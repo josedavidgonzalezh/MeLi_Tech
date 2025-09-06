@@ -1,12 +1,12 @@
 package com.meli.technical.exam.api.products.infrastructure.adapter.in.web;
 
-import com.meli.technical.exam.api.products.application.dto.response.comparison.ComparisonResponseDto;
-import com.meli.technical.exam.api.products.application.dto.response.comparison.PriceAnalysisDto;
-import com.meli.technical.exam.api.products.application.dto.response.comparison.RatingAnalysisDto;
-import com.meli.technical.exam.api.products.application.dto.response.comparison.ComparisonSummaryDto;
-import com.meli.technical.exam.api.products.application.dto.response.PaginatedResponseDto;
 import com.meli.technical.exam.api.products.application.dto.request.ProductDto;
 import com.meli.technical.exam.api.products.application.dto.request.SpecificationDto;
+import com.meli.technical.exam.api.products.application.dto.response.PaginatedResponseDto;
+import com.meli.technical.exam.api.products.application.dto.response.comparison.ComparisonResponseDto;
+import com.meli.technical.exam.api.products.application.dto.response.comparison.ComparisonSummaryDto;
+import com.meli.technical.exam.api.products.application.dto.response.comparison.PriceAnalysisDto;
+import com.meli.technical.exam.api.products.application.dto.response.comparison.RatingAnalysisDto;
 import com.meli.technical.exam.api.products.application.usecase.ProductComparisonUseCase;
 import com.meli.technical.exam.api.products.domain.exception.ProductNotFoundException;
 import org.junit.jupiter.api.Test;

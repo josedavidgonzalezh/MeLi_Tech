@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.meli.technical.exam.api.products.application.dto.request.ProductDto;
 import lombok.Builder;
 import lombok.Getter;
+
 import java.time.Instant;
 import java.util.List;
 

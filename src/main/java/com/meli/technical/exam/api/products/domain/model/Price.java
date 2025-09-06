@@ -6,7 +6,6 @@ import lombok.Value;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Objects;
 
 @Value
 @EqualsAndHashCode(of = "value")

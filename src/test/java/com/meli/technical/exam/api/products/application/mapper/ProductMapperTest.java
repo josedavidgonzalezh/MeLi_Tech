@@ -1,9 +1,10 @@
 package com.meli.technical.exam.api.products.application.mapper;
 
 import com.meli.technical.exam.api.products.application.dto.request.ProductDto;
-import com.meli.technical.exam.api.products.application.dto.request.SpecificationDto;
-import com.meli.technical.exam.api.products.domain.model.*;
-import org.junit.jupiter.api.BeforeEach;
+import com.meli.technical.exam.api.products.domain.model.Price;
+import com.meli.technical.exam.api.products.domain.model.Product;
+import com.meli.technical.exam.api.products.domain.model.ProductId;
+import com.meli.technical.exam.api.products.domain.model.Rating;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 class ProductMapperSpringTest {

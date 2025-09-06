@@ -1,13 +1,12 @@
 package com.meli.technical.exam.api.products.application.usecase;
 
 import com.meli.technical.exam.api.products.application.dto.request.ProductDto;
-import com.meli.technical.exam.api.products.application.dto.response.PaginatedResponseDto;
 import com.meli.technical.exam.api.products.application.dto.response.comparison.ComparisonResponseDto;
 import com.meli.technical.exam.api.products.application.mapper.ProductMapper;
 import com.meli.technical.exam.api.products.domain.exception.ProductNotFoundException;
+import com.meli.technical.exam.api.products.domain.model.Price;
 import com.meli.technical.exam.api.products.domain.model.Product;
 import com.meli.technical.exam.api.products.domain.model.ProductId;
-import com.meli.technical.exam.api.products.domain.model.Price;
 import com.meli.technical.exam.api.products.domain.model.Rating;
 import com.meli.technical.exam.api.products.domain.service.ProductComparisonAnalyzerService;
 import com.meli.technical.exam.api.products.domain.service.ProductService;
@@ -24,7 +23,8 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;

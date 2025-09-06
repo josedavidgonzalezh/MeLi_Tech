@@ -1,8 +1,8 @@
 package com.meli.technical.exam.api.products.domain.validator;
 
+import com.meli.technical.exam.api.products.domain.exception.InvalidProductException;
 import com.meli.technical.exam.api.products.domain.model.Price;
 import com.meli.technical.exam.api.products.domain.model.Product;
-import com.meli.technical.exam.api.products.domain.exception.InvalidProductException;
 import com.meli.technical.exam.api.products.domain.model.ProductId;
 import com.meli.technical.exam.api.products.domain.model.Rating;
 import org.junit.jupiter.api.BeforeEach;

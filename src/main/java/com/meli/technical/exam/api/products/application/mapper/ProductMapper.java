@@ -2,7 +2,6 @@ package com.meli.technical.exam.api.products.application.mapper;
 
 import com.meli.technical.exam.api.products.application.dto.request.ProductDto;
 import com.meli.technical.exam.api.products.domain.model.Product;
-
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

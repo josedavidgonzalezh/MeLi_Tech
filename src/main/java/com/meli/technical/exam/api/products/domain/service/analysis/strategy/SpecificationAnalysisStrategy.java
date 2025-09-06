@@ -5,7 +5,10 @@ import com.meli.technical.exam.api.products.domain.service.analysis.ProductStats
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component

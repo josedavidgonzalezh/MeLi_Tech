@@ -1,13 +1,12 @@
 package com.meli.technical.exam.api.products.domain.model;
 
 import com.meli.technical.exam.api.products.domain.exception.InvalidProductException;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 @Getter
 @EqualsAndHashCode
 @ToString

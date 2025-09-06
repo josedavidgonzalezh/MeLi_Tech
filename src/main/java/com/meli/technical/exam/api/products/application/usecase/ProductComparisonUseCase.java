@@ -1,13 +1,13 @@
 package com.meli.technical.exam.api.products.application.usecase;
 
 
-import com.meli.technical.exam.api.products.application.dto.response.PaginatedResponseDto;
 import com.meli.technical.exam.api.products.application.dto.request.ProductDto;
+import com.meli.technical.exam.api.products.application.dto.response.PaginatedResponseDto;
 import com.meli.technical.exam.api.products.application.dto.response.comparison.ComparisonResponseDto;
 import com.meli.technical.exam.api.products.application.mapper.ProductMapper;
-import com.meli.technical.exam.api.products.domain.service.ProductService;
-import com.meli.technical.exam.api.products.domain.service.ProductComparisonAnalyzerService;
 import com.meli.technical.exam.api.products.domain.exception.ProductNotFoundException;
+import com.meli.technical.exam.api.products.domain.service.ProductComparisonAnalyzerService;
+import com.meli.technical.exam.api.products.domain.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
