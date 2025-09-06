@@ -2,6 +2,118 @@
 
 A sophisticated REST API that provides intelligent product comparison and analysis features, built with Spring Boot WebFlux and following **Domain-Driven Design (DDD)**, **Hexagonal Architecture**, and **Clean Architecture** principles.
 
+## Running the Application
+
+### **Prerequisites**
+- **Java 17** or higher
+- **Gradle** (or use included wrapper)
+
+### **Quick Start**
+```bash
+# Clone and navigate to project
+git clone https://github.com/josedavidgonzalezh/MeLi_Tech/tree/master
+cd products
+
+# Build the application  
+./gradlew build
+
+# Run the application
+./gradlew bootRun
+
+# Alternative: Run JAR directly
+java -jar build/libs/products-0.0.1-SNAPSHOT.jar
+```
+
+### **Running from ZIP File**
+If you received the project as a ZIP file:
+
+#### **Prerequisites for ZIP Delivery**
+- **Java 17** or higher installed and configured in PATH
+- Verify Java installation: `java -version` (should show 17+)
+- No Gradle installation required (uses included Gradle wrapper)
+
+#### **Linux/macOS Setup:**
+```bash
+# Verify Java version (must be 17+)
+java -version
+
+# Extract the ZIP file
+unzip products.zip
+cd products
+
+# Make gradlew executable (Linux/macOS only)
+chmod +x gradlew
+
+# Verify Gradle wrapper works
+./gradlew --version
+
+# Build the application
+./gradlew build
+
+# Run the application
+./gradlew bootRun
+
+# Alternative: Run JAR directly after build
+java -jar build/libs/products-0.0.1-SNAPSHOT.jar
+```
+
+#### **Windows Setup:**
+```cmd
+# Verify Java version (must be 17+)
+java -version
+
+# Extract the ZIP file to a folder
+# Navigate to the project folder using Command Prompt or PowerShell
+cd products
+
+# Verify Gradle wrapper works
+gradlew.bat --version
+
+# Build the application
+gradlew.bat build
+
+# Run the application  
+gradlew.bat bootRun
+
+# Alternative: Run JAR directly after build
+java -jar build\libs\products-0.0.1-SNAPSHOT.jar
+```
+
+#### **Troubleshooting ZIP Setup**
+```bash
+# If Java version is incorrect:
+# Download and install Java 17+ from https://adoptium.net/
+# Set JAVA_HOME environment variable to Java 17+ installation
+
+# If gradlew permission denied (Linux/macOS):
+chmod +x gradlew
+
+# If build fails, clean and retry:
+./gradlew clean build    # Linux/macOS
+gradlew.bat clean build  # Windows
+
+# Verify application is running:
+curl http://localhost:8080/api/v1/products/health
+# Or visit http://localhost:8080/api/v1/products/health in browser
+```
+
+**Application starts on:** `http://localhost:8080`
+
+### **Testing**
+```bash
+# Run all tests
+./gradlew test
+
+# Run with coverage report
+./gradlew test jacocoTestReport
+
+# Run specific test class
+./gradlew test --tests "ProductComparisonAnalyzerServiceTest"
+
+# Run integration tests only
+./gradlew test --tests "*IntegrationTest"
+```
+
 ## Architecture Overview
 
 This project demonstrates a **production-ready architecture** combining multiple architectural patterns:
@@ -40,9 +152,16 @@ src/main/java/com/meli/technical/exam/api/products/
 │   ├── service/                              # Domain Services
 │   │   ├── ProductService.java               # Core product operations
 │   │   ├── ProductComparisonAnalyzerService.java # Comparison business logic
-│   │   └── analysis/                         # Analysis Services & Strategies
-│   │       ├── ProductStats.java             # Product statistics collector
-│   │       ├── ProductStatsCollector.java    # Statistical analysis
+│   │   └── analysis/                         # 🚀 Reactive Analysis Architecture
+│   │       ├── ReactiveStatsCollector.java   # Reactive collector interface (Strategy Pattern)
+│   │       ├── ProductStatsCollector.java    # Facade for coordinating collectors
+│   │       ├── PriceStatsCollector.java      # Reactive price analysis
+│   │       ├── RatingStatsCollector.java     # Reactive rating analysis  
+│   │       ├── SpecStatsCollector.java       # Reactive specification analysis
+│   │       ├── ProductStats.java             # Immutable stats value object
+│   │       ├── PriceStats.java               # Price analysis results
+│   │       ├── RatingStats.java              # Rating analysis results
+│   │       ├── SpecStats.java                # Specification analysis results
 │   │       └── strategy/                     # Strategy Pattern Implementation
 │   │           ├── ProductAnalysisStrategy.java      # Base strategy interface
 │   │           ├── PriceAnalysisStrategy.java        # Price comparison analysis
@@ -100,6 +219,85 @@ src/main/java/com/meli/technical/exam/api/products/
     │   └── GlobalExceptionHandler.java       # Global error handling
     └── config/                               # Configuration
         └── WebConfiguration.java             # Web/CORS configuration
+```
+
+## Reactive Architecture Deep Dive
+
+### **🚀 Fully Reactive Statistics Collection**
+
+The statistics collection system has been completely refactored to use a purely reactive approach, eliminating all blocking operations for optimal performance and scalability.
+
+#### **Architecture Overview**
+```java
+// Reactive Interface (Strategy Pattern)
+ReactiveStatsCollector<T> {
+    Mono<T> collectReactive(Flux<ProductDto> productFlux);
+}
+
+// Specialized Implementations
+PriceStatsCollector    → Reactive price analysis using Flux.reduce()
+RatingStatsCollector   → Reactive rating analysis using Flux.filter() + Flux.collectMap()
+SpecStatsCollector     → Reactive specification analysis using Flux.collectMap()
+
+// Facade Coordinator (Facade Pattern)  
+ProductStatsCollector  → Coordinates all collectors using Mono.zip() for parallel execution
+```
+
+#### **Key Reactive Benefits**
+
+**🔄 Non-Blocking Operations**
+- **No `.collectList()`** - Streams are processed without collecting to memory
+- **No blocking streams** - All Java Stream operations replaced with Flux operators
+- **Pure reactive pipeline** - From input Flux to output Mono without blocking
+
+**⚡ Parallel Processing**
+```java
+// All collectors run concurrently
+Mono.zip(
+    priceCollector.collectReactive(productFlux),     // Parallel execution
+    ratingCollector.collectReactive(productFlux),    // Parallel execution
+    specCollector.collectReactive(productFlux),      // Parallel execution
+    productFlux.count()                              // Parallel execution
+).map(tuple -> /* combine results */)
+```
+
+**💾 Memory Efficiency**
+- **Streaming reductions** using `Flux.reduce()` instead of collecting entire datasets
+- **Reactive aggregations** using `Flux.collectMap()` for distribution calculations  
+- **Backpressure support** for handling large product streams
+- **No intermediate collections** - data flows through the pipeline
+
+**🎯 Design Patterns Used**
+- **Strategy Pattern**: `ReactiveStatsCollector<T>` with specialized implementations
+- **Facade Pattern**: `ProductStatsCollector` coordinates multiple collectors
+- **Factory Pattern**: Static factory methods for easy reactive instantiation
+- **Value Object Pattern**: Immutable result objects (`PriceStats`, `RatingStats`, `SpecStats`)
+
+#### **Performance Comparison**
+
+| Approach | Memory Usage | Blocking Operations | Concurrency | Scalability |
+|----------|--------------|-------------------|-------------|-------------|
+| **Previous (Blocking)** | High (full collections) | Yes (Stream operations) | Sequential | Limited |
+| **Current (Reactive)** | Low (streaming) | None | Parallel | High |
+
+#### **Technical Implementation Examples**
+
+**Price Analysis (Reactive)**
+```java
+// Concurrent min/max/sum operations using Flux.reduce()
+Mono.zip(
+    productFlux.reduce((p1, p2) -> p1.getPrice().compareTo(p2.getPrice()) <= 0 ? p1 : p2),
+    productFlux.reduce((p1, p2) -> p1.getPrice().compareTo(p2.getPrice()) >= 0 ? p1 : p2),
+    productFlux.map(ProductDto::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add),
+    productFlux.collectMap(ProductDto::getName, ProductDto::getPrice)
+)
+```
+
+**Rating Analysis (Reactive)**
+```java  
+// Reactive filtering and collection operations
+productFlux.filter(p -> p.getRating() >= 4.5).collectList()  // Highly rated products
+productFlux.collectMap(ProductDto::getName, ProductDto::getRating)  // Distribution map
 ```
 
 ## Advanced Design Patterns
@@ -197,11 +395,15 @@ The API provides sophisticated product comparison with multiple analysis dimensi
 - **Comparison analytics** for business intelligence
 - **Extensible event handling** for future integrations
 
-### **Reactive Programming**
+### **Reactive Programming with Advanced Statistics Collection**
 - **Non-blocking I/O** with Spring WebFlux
 - **Reactive streams** with Mono and Flux
-- **Better performance** under load
+- **Better performance** under load  
 - **Scalable architecture** for high throughput
+- **Fully Reactive Statistics Pipeline** - All product analysis uses reactive streams
+- **Parallel Processing** - Price, rating, and specification analysis run concurrently
+- **Memory Efficient** - Streaming processing without blocking collections
+- **Backpressure Support** - Can handle large product datasets efficiently
 
 ## API Endpoints
 
@@ -368,44 +570,7 @@ GET /api/v1/products/health
 - **Jackson** - High-performance JSON processing
 - **SLF4J** - Logging facade
 
-## Running the Application
 
-### **Prerequisites**
-- **Java 17** or higher
-- **Gradle** (or use included wrapper)
-
-### **Quick Start**
-```bash
-# Clone and navigate to project
-git clone https://github.com/josedavidgonzalezh/MeLi_Tech/tree/master
-cd products
-
-# Build the application  
-./gradlew build
-
-# Run the application
-./gradlew bootRun
-
-# Alternative: Run JAR directly
-java -jar build/libs/products-0.0.1-SNAPSHOT.jar
-```
-
-**Application starts on:** `http://localhost:8080`
-
-### **Testing**
-```bash
-# Run all tests
-./gradlew test
-
-# Run with coverage report
-./gradlew test jacocoTestReport
-
-# Run specific test class
-./gradlew test --tests "ProductComparisonAnalyzerServiceTest"
-
-# Run integration tests only
-./gradlew test --tests "*IntegrationTest"
-```
 
 ## Sample Data
 
