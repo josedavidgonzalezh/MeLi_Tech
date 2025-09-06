@@ -44,14 +44,6 @@ public class ProductStats {
     // Calculated collections
     private final Map<String, BigDecimal> priceDistribution;
     private final Map<String, Double> ratingDistribution;
-    
-    public static ProductStats fromProducts(List<ProductDto> products) {
-        if (products == null || products.isEmpty()) {
-            return createEmpty();
-        }
-        
-        return ProductStatsCollector.collectStats(products);
-    }
 
     public static Mono<ProductStats> fromProductsReactive(Flux<ProductDto> productFlux) {
         return ProductStatsCollector.collectStatsReactive(productFlux);

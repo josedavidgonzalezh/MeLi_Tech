@@ -66,26 +66,7 @@ public class ProductComparisonAnalyzerService {
                                     .build());
                 });
     }
-    
-    private Mono<ComparisonResponseDto> analyzeProductsFromList(List<ProductDto> products, List<String> requestedIds) {
-        if (products == null || products.isEmpty()) {
-            return Mono.just(createEmptyResponse(requestedIds));
-        }
-        
-        return Mono.fromSupplier(() -> ProductStats.fromProducts(products))
-                .flatMap(this::performAnalysis)
-                .map(analysisResults -> ComparisonResponseDto.builder()
-                        .products(products)
-                        .totalProducts(products.size())
-                        .requestedIds(requestedIds)
-                        .comparisonTimestamp(Instant.now())
-                        .priceAnalysis(analysisResults.priceAnalysis)
-                        .ratingAnalysis(analysisResults.ratingAnalysis)
-                        .specificationAnalysis(analysisResults.specificationAnalysis)
-                        .recommendations(analysisResults.recommendations)
-                        .summary(analysisResults.summary)
-                        .build());
-    }
+
     
     private Mono<AnalysisResults> performAnalysis(ProductStats productStats) {
         return Mono.zip(
