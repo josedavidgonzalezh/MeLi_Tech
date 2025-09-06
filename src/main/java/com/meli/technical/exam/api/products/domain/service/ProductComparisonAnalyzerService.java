@@ -39,11 +39,33 @@ public class ProductComparisonAnalyzerService {
 
     public Mono<ComparisonResponseDto> analyzeProductsReactive(Flux<ProductDto> productFlux, List<String> requestedIds) {
         return productFlux
-                .collectList()
-                .flatMap(products -> analyzeProductsFromList(products, requestedIds))
+                .as(flux -> analyzeProductsFromFlux(flux, requestedIds))
                 .doOnError(error -> logger.error("Error during reactive product analysis", error));
     }
 
+    private Mono<ComparisonResponseDto> analyzeProductsFromFlux(Flux<ProductDto> productFlux, List<String> requestedIds) {
+        return productFlux
+                .collectList()
+                .flatMap(products -> {
+                    if (products.isEmpty()) {
+                        return Mono.just(createEmptyResponse(requestedIds));
+                    }
+                    
+                    return ProductStats.fromProductsReactive(Flux.fromIterable(products))
+                            .flatMap(this::performAnalysis)
+                            .map(analysisResults -> ComparisonResponseDto.builder()
+                                    .products(products)
+                                    .totalProducts(products.size())
+                                    .requestedIds(requestedIds)
+                                    .comparisonTimestamp(Instant.now())
+                                    .priceAnalysis(analysisResults.priceAnalysis)
+                                    .ratingAnalysis(analysisResults.ratingAnalysis)
+                                    .specificationAnalysis(analysisResults.specificationAnalysis)
+                                    .recommendations(analysisResults.recommendations)
+                                    .summary(analysisResults.summary)
+                                    .build());
+                });
+    }
     
     private Mono<ComparisonResponseDto> analyzeProductsFromList(List<ProductDto> products, List<String> requestedIds) {
         if (products == null || products.isEmpty()) {

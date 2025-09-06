@@ -3,6 +3,8 @@ package com.meli.technical.exam.api.products.domain.service.analysis;
 import com.meli.technical.exam.api.products.application.dto.request.ProductDto;
 import lombok.Builder;
 import lombok.Getter;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -49,6 +51,10 @@ public class ProductStats {
         }
         
         return ProductStatsCollector.collectStats(products);
+    }
+
+    public static Mono<ProductStats> fromProductsReactive(Flux<ProductDto> productFlux) {
+        return ProductStatsCollector.collectStatsReactive(productFlux);
     }
     
     public static ProductStats createEmpty() {
