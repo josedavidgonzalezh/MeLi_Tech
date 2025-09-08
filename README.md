@@ -728,7 +728,6 @@ src/test/java/
 GET /actuator/health     # Application health status
 GET /actuator/info       # Application information
 GET /actuator/metrics    # Application metrics
-GET /actuator/prometheus # Metrics in Prometheus format
 ```
 
 ### **Custom Metrics** (Future Enhancement)

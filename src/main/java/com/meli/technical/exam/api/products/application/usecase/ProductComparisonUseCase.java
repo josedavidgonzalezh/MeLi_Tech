@@ -42,7 +42,7 @@ public class ProductComparisonUseCase {
 
     public Mono<ComparisonResponseDto> compareProducts(List<String> productIds) {
         if (productIds == null || productIds.isEmpty()) {
-            return comparisonAnalyzer.analyzeProductsReactive(Flux.empty(), productIds);
+            return Mono.error(new IllegalArgumentException("Cannot have empty IDs"));
         }
 
         if (productIds.size() > MAX_COMPARE_SIZE) {
