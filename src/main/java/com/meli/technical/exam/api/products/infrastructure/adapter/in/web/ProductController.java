@@ -4,6 +4,7 @@ import com.meli.technical.exam.api.products.application.dto.request.ProductDto;
 import com.meli.technical.exam.api.products.application.dto.response.PaginatedResponseDto;
 import com.meli.technical.exam.api.products.application.dto.response.comparison.ComparisonResponseDto;
 import com.meli.technical.exam.api.products.application.usecase.ProductComparisonUseCase;
+import com.meli.technical.exam.api.products.infrastructure.adapter.in.web.utils.ProductComparisonValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -37,10 +38,8 @@ public class ProductController {
     public Mono<ResponseEntity<ComparisonResponseDto>> compareProducts(
             @RequestParam("ids") String ids) {
         
-        if (ids == null || ids.trim().isEmpty()) {
-            return productComparisonUseCase.compareProducts(List.of())
-                    .map(ResponseEntity::ok);
-        }
+        // Validate the ids parameter
+        ProductComparisonValidator.validateCompareRequest(ids);
 
         List<String> productIds = Arrays.asList(ids.split(","));
         
@@ -50,11 +49,6 @@ public class ProductController {
                 .filter(id -> !id.isEmpty())
                 .distinct()
                 .toList();
-
-        if (cleanIds.isEmpty()) {
-            return productComparisonUseCase.compareProducts(List.of())
-                    .map(ResponseEntity::ok);
-        }
 
         return productComparisonUseCase.compareProducts(cleanIds)
                 .map(ResponseEntity::ok)
