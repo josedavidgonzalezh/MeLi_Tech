@@ -7,6 +7,7 @@ import lombok.ToString;
 
 import java.util.UUID;
 
+//ProductId validations are done here, reference for the future
 @Getter
 @EqualsAndHashCode
 @ToString

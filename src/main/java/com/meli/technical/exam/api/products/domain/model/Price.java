@@ -16,6 +16,7 @@ public class Price {
     private static final BigDecimal MAX_PRICE = new BigDecimal("999999.99");
     private static final int SCALE = 2;
 
+    //Validations are done just for future expansions (POST and PUT)
     private Price(BigDecimal value) {
         if (value == null) throw new InvalidProductException("Price cannot be null");
         if (value.compareTo(BigDecimal.ZERO) < 0) throw new InvalidProductException("Price cannot be negative");
