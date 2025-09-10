@@ -130,11 +130,9 @@ class ProductControllerTest {
         webTestClient.get()
                 .uri("/api/v1/products/compare?ids=")
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().is4xxClientError()
                 .expectBody()
-                .jsonPath("$.products").isArray()
-                .jsonPath("$.products.length()").isEqualTo(0)
-                .jsonPath("$.totalProducts").isEqualTo(0);
+                .jsonPath("$.validationErrors").isArray();
     }
 
     @Test
@@ -247,10 +245,9 @@ class ProductControllerTest {
         webTestClient.get()
                 .uri("/api/v1/products/compare?ids= 1 , 1 , ")
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().is4xxClientError()
                 .expectBody()
-                .jsonPath("$.products.length()").isEqualTo(1)
-                .jsonPath("$.totalProducts").isEqualTo(1);
+                .jsonPath("$.validationErrors").isArray();
     }
 
     @Test

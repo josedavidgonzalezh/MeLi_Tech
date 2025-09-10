@@ -172,48 +172,23 @@ class ProductComparisonUseCaseTest {
     }
 
     @Test
-    void shouldReturnEmptyComparisonWhenProductIdsIsEmpty() {
-        // Given
-        List<String> emptyIds = List.of();
-        ComparisonResponseDto emptyResponse = ComparisonResponseDto.builder()
-                .products(List.of())
-                .totalProducts(0)
-                .requestedIds(emptyIds)
-                .comparisonTimestamp(Instant.now())
-                .build();
-
-        when(comparisonAnalyzer.analyzeProductsReactive(any(), eq(emptyIds)))
-                .thenReturn(Mono.just(emptyResponse));
-
+    void shouldReturnErrorWhenProductIdsIsEmpty() {
         // When & Then
-        StepVerifier.create(useCase.compareProducts(emptyIds))
-                .expectNext(emptyResponse)
-                .verifyComplete();
+        StepVerifier.create(useCase.compareProducts(List.of()))
+                .expectError(IllegalArgumentException.class)
+                .verify();
 
-        verify(comparisonAnalyzer).analyzeProductsReactive(any(), eq(emptyIds));
-        verifyNoInteractions(productService, productMapper);
+        verifyNoInteractions(productService, productMapper, comparisonAnalyzer);
     }
 
     @Test
-    void shouldReturnEmptyComparisonWhenProductIdsIsNull() {
-        // Given
-        ComparisonResponseDto emptyResponse = ComparisonResponseDto.builder()
-                .products(List.of())
-                .totalProducts(0)
-                .requestedIds(null)
-                .comparisonTimestamp(Instant.now())
-                .build();
-
-        when(comparisonAnalyzer.analyzeProductsReactive(any(), eq((List<String>) null)))
-                .thenReturn(Mono.just(emptyResponse));
-
+    void shouldReturnErrorWhenProductIdsIsNull() {
         // When & Then
         StepVerifier.create(useCase.compareProducts(null))
-                .expectNext(emptyResponse)
-                .verifyComplete();
+                .expectError(IllegalArgumentException.class)
+                .verify();
 
-        verify(comparisonAnalyzer).analyzeProductsReactive(any(), eq((List<String>) null));
-        verifyNoInteractions(productService, productMapper);
+        verifyNoInteractions(productService, productMapper, comparisonAnalyzer);
     }
 
     @Test

@@ -82,11 +82,9 @@ class ProductComparisonIntegrationTest {
         webTestClient.get()
                 .uri("/api/v1/products/compare?ids=")
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().is4xxClientError()
                 .expectBody()
-                .jsonPath("$.products").isArray()
-                .jsonPath("$.products.length()").isEqualTo(0)
-                .jsonPath("$.totalProducts").isEqualTo(0);
+                .jsonPath("$.validationErrors").isArray();
     }
 
     @Test
@@ -150,11 +148,9 @@ class ProductComparisonIntegrationTest {
         webTestClient.get()
                 .uri("/api/v1/products/compare?ids= 1 , 1 , 2 , ")
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().is4xxClientError()
                 .expectBody()
-                .jsonPath("$.products").isArray()
-                .jsonPath("$.requestedIds").isArray()
-                .jsonPath("$.comparisonTimestamp").exists();
+                .jsonPath("$.validationErrors").isArray();
     }
 
     @Test
